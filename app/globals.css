@@ -24,7 +24,8 @@ body {
 .map-wrap {
   position: relative;
   width: 100%;
-  height: calc(100vh - 200px);
+  max-width: 600px;
+  height: 100vh
 }
 
 .map {

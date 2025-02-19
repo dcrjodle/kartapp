@@ -29,6 +29,11 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
         zoom: zoom,
       });
 
+      map.current.setMaxBounds([
+        [5.4943, 45.8848], // Southwest corner (min longitude, min latitude)
+        [28.3467, 75.5383], // Northeast corner (max longitude, max latitude)
+      ]);
+
       map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
       map.current.on("move", () => {
