@@ -18,7 +18,6 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
   const [lng, setLng] = useState(initialLng);
   const [lat, setLat] = useState(initialLat);
   const [zoom, setZoom] = useState(initialZoom);
-  const [hoverId, setHoverId] = useState<number | string | undefined>(2);
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -44,10 +43,43 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
       const fillId = "kom-fills";
       const borderId = "kom-borders";
       map.current.on("load", () => {
+        map.current?.addSource("world-data", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                geometry: {
+                  type: "Polygon",
+                  coordinates: [
+                    [
+                      [-180, -90],
+                      [180, -90],
+                      [180, 90],
+                      [-180, 90],
+                      [-180, -90],
+                    ],
+                  ],
+                },
+                properties: {},
+              },
+            ],
+          },
+        });
         map.current?.addSource(sourceId, {
           type: "geojson",
           data: sweden,
           generateId: true,
+        });
+        map.current?.addLayer({
+          id: "world-layer",
+          type: "fill",
+          source: "world-data",
+          paint: {
+            "fill-color": "#FFFFFF",
+            "fill-opacity": 0.5,
+          },
         });
         // The feature-state dependent fill-opacity expression will render the hover effect
         // when a feature's hover state is set to true.
@@ -79,17 +111,20 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
 
         // When the user moves their mouse over the state-fill layer, we'll update the
         // feature state for the feature under the mouse.
+        let testId: string | number | undefined = 0;
         map.current?.on("mousemove", fillId, (e) => {
           if (e.features?.length) {
-            if (hoverId) {
+            if (testId) {
               map.current?.setFeatureState(
-                { source: sourceId, id: hoverId },
+                { source: sourceId, id: testId },
                 { hover: false }
               );
             }
-            setHoverId(e.features[0].id);
+            console.log("featureStateId ", e.features[0].id);
+
+            testId = e.features[0].id;
             map.current?.setFeatureState(
-              { source: sourceId, id: hoverId },
+              { source: sourceId, id: testId },
               { hover: true }
             );
           }
@@ -98,13 +133,12 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
         // When the mouse leaves the state-fill layer, update the feature state of the
         // previously hovered feature.
         map.current?.on("mouseleave", fillId, () => {
-          if (hoverId) {
+          if (testId) {
             map.current?.setFeatureState(
-              { source: sourceId, id: hoverId },
+              { source: sourceId, id: testId },
               { hover: false }
             );
           }
-          setHoverId(undefined);
         });
       });
     }
