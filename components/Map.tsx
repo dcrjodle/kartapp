@@ -125,13 +125,13 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
                 { hover: false }
               );
             }
-            console.log("featureStateId ", e.features[0].id);
 
             testId = e.features[0].id;
             map.current?.setFeatureState(
               { source: sourceId, id: testId },
               { hover: true }
             );
+            // Set focus on feature and zoom in
           }
         });
 
