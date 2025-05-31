@@ -15,9 +15,20 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
+  const [outsideSweden, setOutsideSweden] = useState(false);
   const [lng, setLng] = useState(initialLng);
   const [lat, setLat] = useState(initialLat);
   const [zoom, setZoom] = useState(initialZoom);
+
+  const OUTSIDE_SWEDEN_BOUNDS: [[number, number], [number, number]] = [
+    [-40, 20], // Far southwest (includes parts of the Atlantic & North Africa)
+    [70, 85], // Far northeast (Siberia, Arctic)
+  ];
+
+  const SWEDEN_BOUNDS: [[number, number], [number, number]] = [
+    [10.5, 55.0], // Southwest corner [lng, lat]
+    [24.2, 69.5], // Northeast corner [lng, lat]
+  ];
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -29,20 +40,35 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
         zoom: zoom,
       });
 
-      map.current.setMaxBounds([
-        [5.4943, 45.8848], // Southwest corner (min longitude, min latitude)
-        [28.3467, 75.5383], // Northeast corner (max longitude, max latitude)
-      ]);
+      // map.current.setMaxBounds([
+      //   [5.4943, 45.8848], // Southwest corner (min longitude, min latitude)
+      //   [28.3467, 75.5383], // Northeast corner (max longitude, max latitude)
+      // ]);
 
-      map.current.addControl(new maplibregl.NavigationControl(), "top-right");
+      //map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
-      map.current.on("move", () => {
-        if (map.current) {
-          setLng(Number(map.current.getCenter().lng.toFixed(4)));
-          setLat(Number(map.current.getCenter().lat.toFixed(4)));
-          setZoom(Number(map.current.getZoom().toFixed(2)));
-        }
-      });
+      const checkBounds = () => {
+        const bounds = map.current?.getBounds();
+        if (!bounds) return;
+        console.log("Bounds:", bounds);
+        const isOutside =
+          bounds.getSouth() < OUTSIDE_SWEDEN_BOUNDS[0][1] ||
+          bounds.getWest() < OUTSIDE_SWEDEN_BOUNDS[0][0] ||
+          bounds.getNorth() > OUTSIDE_SWEDEN_BOUNDS[1][1] ||
+          bounds.getEast() > OUTSIDE_SWEDEN_BOUNDS[1][0];
+
+        setOutsideSweden(isOutside);
+      };
+
+      map.current.on("moveend", checkBounds);
+
+      // map.current.on("move", () => {
+      //   if (map.current) {
+      //     setLng(Number(map.current.getCenter().lng.toFixed(4)));
+      //     setLat(Number(map.current.getCenter().lat.toFixed(4)));
+      //     setZoom(Number(map.current.getZoom().toFixed(2)));
+      //   }
+      // });
 
       const sourceId = "points";
       const fillId = "kom-fills";
@@ -119,8 +145,9 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
         let testId: string | number | undefined = 0;
         map.current?.on("mousemove", fillId, (e) => {
           if (e.features?.length) {
-            if (testId) {
-              map.current?.setFeatureState(
+            if (testId && map.current) {
+              map.current.getCanvas().style.cursor = "pointer";
+              map.current.setFeatureState(
                 { source: sourceId, id: testId },
                 { hover: false }
               );
@@ -145,16 +172,53 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
             );
           }
         });
+
+        map.current?.on("click", fillId, (e) => {
+          console.log("click", e);
+          if (map.current) {
+            console.log(e.features);
+            new maplibregl.Popup()
+              .setLngLat(e.lngLat)
+              .setHTML(e.features?.[0].properties.kom_namn)
+              .addTo(map.current);
+          }
+        });
       });
     }
   }, [lng, lat, zoom]);
 
+  const returnToSweden = () => {
+    map.current?.fitBounds(SWEDEN_BOUNDS, {
+      padding: 20,
+      duration: 1000,
+    });
+  };
+
   return (
     <div className="map-wrap">
       <div ref={mapContainer} className="map" />
-      <div className="sidebar">
+      {/* <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div>
+      </div> */}
+      {outsideSweden && (
+        <button
+          onClick={returnToSweden}
+          style={{
+            color: "#333",
+            position: "absolute",
+            top: 20,
+            right: 20,
+            padding: "10px 15px",
+            backgroundColor: "#fff",
+            border: "1px solid #ccc",
+            borderRadius: 4,
+            cursor: "pointer",
+            zIndex: 1,
+          }}
+        >
+          Return to Sweden
+        </button>
+      )}
     </div>
   );
 };

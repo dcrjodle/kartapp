@@ -7,7 +7,7 @@ const swedenPosition = {
   lng: 18,
 };
 
-const defaultZoom = 4;
+const defaultZoom = 4.5;
 
 export default function Home() {
   return (

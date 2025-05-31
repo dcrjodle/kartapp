@@ -24,7 +24,6 @@ body {
 .map-wrap {
   position: relative;
   width: 100%;
-  max-width: 600px;
   height: 100vh
 }
 
@@ -47,3 +46,18 @@ body {
   border-radius: 4px;
 }
 
+.maplibregl-popup {
+  color:black;
+  max-width: 400px !important;
+  min-width: 100px !important;
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.maplibregl-popup-close-button {
+  position: absolute;
+  right: 8px !important;
+  color: black;
+}
+.maplibregl-popup-content {
+  padding: 10px;
+}
