@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import maplibregl from "maplibre-gl";
 
 // TODO Move to a separate file
-export type Id = string | number | undefined;
+export type Id = string | number;
 export type Position = number[];
 export type Municipality = {
   sourceId: Id;
