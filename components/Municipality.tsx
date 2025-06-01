@@ -11,7 +11,7 @@ export type Municipality = {
   coordinates: Position[][];
 };
 
-type PolygonLayerProps = {
+type MunicipalityProps = {
   map: maplibregl.Map | null;
   id: string;
   coordinates: Position[][];
@@ -19,13 +19,13 @@ type PolygonLayerProps = {
   onClick?: () => void;
 };
 
-export const PolygonLayer = ({
+export const Municipality = ({
   map,
   id,
   coordinates,
   fillColor = "#088",
   onClick,
-}: PolygonLayerProps) => {
+}: MunicipalityProps) => {
   useEffect(() => {
     console.log("Adding polygon layer", id, coordinates);
     const sourceId = `${id}-source`;

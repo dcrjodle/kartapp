@@ -4,7 +4,8 @@ import type React from "react";
 import { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Municipality } from "./District";
+import { Municipality } from "./Municipality";
+import { createGeoJsonSource, createMapLayer } from "@/lib/utils";
 
 interface MapProps {
   municipalities: Municipality[];
@@ -59,7 +60,7 @@ const Map: React.FC<MapProps> = ({
         setOutsideSweden(isOutside);
       };
 
-      map.current.on("moveend", checkBounds);
+      map.current.on("move", checkBounds);
 
       // map.current.on("move", () => {
       //   if (map.current) {
@@ -70,40 +71,14 @@ const Map: React.FC<MapProps> = ({
       // });
 
       map.current.on("load", () => {
-        console.log("Map loaded");
-        municipalities.forEach((municipality, index) => {
-          const sourceId = `municipality-source-${index}`;
-          const fillId = `municipality-fill-${index}`;
-
-          // Add GeoJSON source for each municipality
-          map.current?.addSource(sourceId, {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Polygon",
-                coordinates: municipality.coordinates,
-              },
-              properties: {},
-            },
-            generateId: true,
-          });
-
-          // Add fill layer for the municipality
-          map.current?.addLayer({
-            id: fillId,
-            type: "fill",
-            source: sourceId,
-            paint: {
-              "fill-color": "#627BC1",
-              "fill-opacity": [
-                "case",
-                ["boolean", ["feature-state", "hover"], false],
-                1,
-                0.5,
-              ],
-            },
-          });
+        municipalities.forEach((municipality) => {
+          const source = createGeoJsonSource(municipality.coordinates);
+          const layer = createMapLayer(
+            municipality.layerId,
+            municipality.sourceId
+          );
+          map.current?.addSource(municipality.sourceId as string, source);
+          map.current?.addLayer(layer);
         });
         // // Add geojson on entire world
         // map.current?.addSource("world-data", {
