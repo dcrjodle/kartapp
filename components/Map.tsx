@@ -4,15 +4,21 @@ import type React from "react";
 import { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { sweden } from "./source/sweden";
+import { Municipality } from "./District";
 
 interface MapProps {
+  municipalities: Municipality[];
   initialLng: number;
   initialLat: number;
   initialZoom: number;
 }
 
-const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
+const Map: React.FC<MapProps> = ({
+  municipalities,
+  initialLng,
+  initialLat,
+  initialZoom,
+}) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const [outsideSweden, setOutsideSweden] = useState(false);
@@ -31,6 +37,7 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
   ];
 
   useEffect(() => {
+    console.log("Map component mounted");
     if (map.current) return; // initialize map only once
     if (mapContainer.current) {
       map.current = new maplibregl.Map({
@@ -40,17 +47,9 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
         zoom: zoom,
       });
 
-      // map.current.setMaxBounds([
-      //   [5.4943, 45.8848], // Southwest corner (min longitude, min latitude)
-      //   [28.3467, 75.5383], // Northeast corner (max longitude, max latitude)
-      // ]);
-
-      //map.current.addControl(new maplibregl.NavigationControl(), "top-right");
-
       const checkBounds = () => {
         const bounds = map.current?.getBounds();
         if (!bounds) return;
-        console.log("Bounds:", bounds);
         const isOutside =
           bounds.getSouth() < OUTSIDE_SWEDEN_BOUNDS[0][1] ||
           bounds.getWest() < OUTSIDE_SWEDEN_BOUNDS[0][0] ||
@@ -70,122 +69,160 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
       //   }
       // });
 
-      const sourceId = "points";
-      const fillId = "kom-fills";
-      const borderId = "kom-borders";
       map.current.on("load", () => {
-        map.current?.addSource("world-data", {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: [
-              {
-                type: "Feature",
-                geometry: {
-                  type: "Polygon",
-                  coordinates: [
-                    [
-                      [-180, -90],
-                      [180, -90],
-                      [180, 90],
-                      [-180, 90],
-                      [-180, -90],
-                    ],
-                  ],
-                },
-                properties: {},
+        console.log("Map loaded");
+        municipalities.forEach((municipality, index) => {
+          const sourceId = `municipality-source-${index}`;
+          const fillId = `municipality-fill-${index}`;
+
+          // Add GeoJSON source for each municipality
+          map.current?.addSource(sourceId, {
+            type: "geojson",
+            data: {
+              type: "Feature",
+              geometry: {
+                type: "Polygon",
+                coordinates: municipality.coordinates,
               },
-            ],
-          },
+              properties: {},
+            },
+            generateId: true,
+          });
+
+          // Add fill layer for the municipality
+          map.current?.addLayer({
+            id: fillId,
+            type: "fill",
+            source: sourceId,
+            paint: {
+              "fill-color": "#627BC1",
+              "fill-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                1,
+                0.5,
+              ],
+            },
+          });
         });
-        map.current?.addSource(sourceId, {
-          type: "geojson",
-          data: sweden,
-          generateId: true,
-        });
-        map.current?.addLayer({
-          id: "world-layer",
-          type: "fill",
-          source: "world-data",
-          paint: {
-            "fill-color": "#FFFFFF",
-            "fill-opacity": 0.5,
-          },
-        });
-        // The feature-state dependent fill-opacity expression will render the hover effect
-        // when a feature's hover state is set to true.
-        map.current?.addLayer({
-          id: fillId,
-          type: "fill",
-          source: sourceId,
-          layout: {},
-          paint: {
-            "fill-color": "#627BC1",
-            "fill-opacity": [
-              "case",
-              ["boolean", ["feature-state", "hover"], false],
-              1,
-              0.5,
-            ],
-          },
-        });
-        map.current?.addLayer({
-          id: borderId,
-          type: "line",
-          source: sourceId,
-          layout: {},
-          paint: {
-            "line-color": "#627BC1",
-            "line-width": 2,
-          },
-        });
+        // // Add geojson on entire world
+        // map.current?.addSource("world-data", {
+        //   type: "geojson",
+        //   data: {
+        //     type: "FeatureCollection",
+        //     features: [
+        //       {
+        //         type: "Feature",
+        //         geometry: {
+        //           type: "Polygon",
+        //           coordinates: [
+        //             [
+        //               [-180, -90],
+        //               [180, -90],
+        //               [180, 90],
+        //               [-180, 90],
+        //               [-180, -90],
+        //             ],
+        //           ],
+        //         },
+        //         properties: {},
+        //       },
+        //     ],
+        //   },
+        // });
+
+        // // Add a fill layer to bleach out the world
+        // map.current?.addLayer({
+        //   id: "world-layer",
+        //   type: "fill",
+        //   source: "world-data",
+        //   paint: {
+        //     "fill-color": "#FFFFFF",
+        //     "fill-opacity": 0.5,
+        //   },
+        // });
+
+        // Add geojson source for Sweden
+        // map.current?.addSource(sourceId, {
+        //   type: "geojson",
+        //   data: sweden,
+        //   generateId: true,
+        // });
+
+        // Add the fill layer for the Swedish municipalities
+        // map.current?.addLayer({
+        //   id: fillId,
+        //   type: "fill",
+        //   source: sourceId,
+        //   layout: {},
+        //   paint: {
+        //     "fill-color": "#627BC1",
+        //     "fill-opacity": [
+        //       "case",
+        //       ["boolean", ["feature-state", "hover"], false],
+        //       1,
+        //       0.5,
+        //     ],
+        //   },
+        // });
+
+        // Add the line layer for the Swedish municipalities
+        // map.current?.addLayer({
+        //   id: borderId,
+        //   type: "line",
+        //   source: sourceId,
+        //   layout: {},
+        //   paint: {
+        //     "line-color": "#627BC1",
+        //     "line-width": 2,
+        //   },
+        // });
 
         // When the user moves their mouse over the state-fill layer, we'll update the
         // feature state for the feature under the mouse.
-        let testId: string | number | undefined = 0;
-        map.current?.on("mousemove", fillId, (e) => {
-          if (e.features?.length) {
-            if (testId && map.current) {
-              map.current.getCanvas().style.cursor = "pointer";
-              map.current.setFeatureState(
-                { source: sourceId, id: testId },
-                { hover: false }
-              );
-            }
+        //   let testId: string | number | undefined = 0;
+        //   map.current?.on("mousemove", fillId, (e) => {
+        //     if (e.features?.length) {
+        //       if (testId && map.current) {
+        //         map.current.getCanvas().style.cursor = "pointer";
+        //         map.current.setFeatureState(
+        //           { source: sourceId, id: testId },
+        //           { hover: false }
+        //         );
+        //       }
 
-            testId = e.features[0].id;
-            map.current?.setFeatureState(
-              { source: sourceId, id: testId },
-              { hover: true }
-            );
-            // Set focus on feature and zoom in
-          }
-        });
+        //       testId = e.features[0].id;
+        //       map.current?.setFeatureState(
+        //         { source: sourceId, id: testId },
+        //         { hover: true }
+        //       );
+        //       // Set focus on feature and zoom in
+        //     }
+        //   });
 
-        // When the mouse leaves the state-fill layer, update the feature state of the
-        // previously hovered feature.
-        map.current?.on("mouseleave", fillId, () => {
-          if (testId) {
-            map.current?.setFeatureState(
-              { source: sourceId, id: testId },
-              { hover: false }
-            );
-          }
-        });
+        //   // When the mouse leaves the state-fill layer, update the feature state of the
+        //   // previously hovered feature.
+        //   map.current?.on("mouseleave", fillId, () => {
+        //     if (testId) {
+        //       map.current?.setFeatureState(
+        //         { source: sourceId, id: testId },
+        //         { hover: false }
+        //       );
+        //     }
+        //   });
 
-        map.current?.on("click", fillId, (e) => {
-          console.log("click", e);
-          if (map.current) {
-            console.log(e.features);
-            new maplibregl.Popup()
-              .setLngLat(e.lngLat)
-              .setHTML(e.features?.[0].properties.kom_namn)
-              .addTo(map.current);
-          }
-        });
+        //   // When the user clicks on a feature in the state-fill layer, we'll open a popup
+        //   map.current?.on("click", fillId, (e) => {
+        //     if (map.current) {
+        //       new maplibregl.Popup()
+        //         .setLngLat(e.lngLat)
+        //         .setHTML(e.features?.[0].properties.kom_namn)
+        //         .addTo(map.current);
+        //     }
+        //   });
       });
     }
-  }, [lng, lat, zoom]);
+  }, []);
 
   const returnToSweden = () => {
     map.current?.fitBounds(SWEDEN_BOUNDS, {
@@ -197,9 +234,6 @@ const Map: React.FC<MapProps> = ({ initialLng, initialLat, initialZoom }) => {
   return (
     <div className="map-wrap">
       <div ref={mapContainer} className="map" />
-      {/* <div className="sidebar">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div> */}
       {outsideSweden && (
         <button
           onClick={returnToSweden}
