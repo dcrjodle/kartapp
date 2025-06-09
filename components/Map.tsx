@@ -37,6 +37,18 @@ const Map: React.FC<MapProps> = ({
     [24.2, 69.5], // Northeast corner [lng, lat]
   ];
 
+  const checkBounds = () => {
+    const bounds = map.current?.getBounds();
+    if (!bounds) return;
+    const isOutside =
+      bounds.getSouth() < OUTSIDE_SWEDEN_BOUNDS[0][1] ||
+      bounds.getWest() < OUTSIDE_SWEDEN_BOUNDS[0][0] ||
+      bounds.getNorth() > OUTSIDE_SWEDEN_BOUNDS[1][1] ||
+      bounds.getEast() > OUTSIDE_SWEDEN_BOUNDS[1][0];
+
+    setOutsideSweden(isOutside);
+  };
+
   useEffect(() => {
     console.log("Map component mounted");
     if (map.current) return; // initialize map only once
@@ -48,40 +60,28 @@ const Map: React.FC<MapProps> = ({
         zoom: zoom,
       });
 
-      const checkBounds = () => {
-        const bounds = map.current?.getBounds();
-        if (!bounds) return;
-        const isOutside =
-          bounds.getSouth() < OUTSIDE_SWEDEN_BOUNDS[0][1] ||
-          bounds.getWest() < OUTSIDE_SWEDEN_BOUNDS[0][0] ||
-          bounds.getNorth() > OUTSIDE_SWEDEN_BOUNDS[1][1] ||
-          bounds.getEast() > OUTSIDE_SWEDEN_BOUNDS[1][0];
-
-        setOutsideSweden(isOutside);
-      };
-
       map.current.on("move", checkBounds);
-
-      // map.current.on("move", () => {
-      //   if (map.current) {
-      //     setLng(Number(map.current.getCenter().lng.toFixed(4)));
-      //     setLat(Number(map.current.getCenter().lat.toFixed(4)));
-      //     setZoom(Number(map.current.getZoom().toFixed(2)));
-      //   }
-      // });
 
       map.current.on("load", () => {
         municipalities.forEach((municipality) => {
+          if (!municipality) return;
           const source = createGeoJsonSource(municipality.coordinates);
           const layer = createMapLayer(
             municipality.layerId,
             municipality.sourceId
           );
+
+          console.log(
+            "Adding municipality layer",
+            municipality.layerId,
+            municipality.coordinates
+          );
           map.current?.addSource(municipality.sourceId as string, source);
           map.current?.addLayer(layer);
         });
+
         // // Add geojson on entire world
-        // map.current?.addSource("world-data", {
+        // map.current?.addSource("world-data", {q
         //   type: "geojson",
         //   data: {
         //     type: "FeatureCollection",

@@ -9,7 +9,7 @@ export type Municipality = {
   layerId: Id;
   borderId: Id;
   coordinates: Position[][];
-};
+} | null;
 
 type MunicipalityProps = {
   map: maplibregl.Map | null;

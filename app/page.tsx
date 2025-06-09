@@ -15,15 +15,19 @@ export default function Home() {
     // TODO remove this className when the map is ready
     <main className="flex min-h-screen flex-col items-center justify-between ">
       <Map
-        municipalities={sweden.features.map((feature) => ({
-          sourceId: feature.id,
-          layerId: `${feature.id}-fill`,
-          borderId: `${feature.id}-border`,
-          coordinates:
-            feature.geometry.type === "Polygon"
-              ? feature.geometry.coordinates
-              : [],
-        }))}
+        municipalities={sweden.features.map((feature) => {
+          console.log("Feature properties:");
+          if (!feature.properties?.id) return null;
+          return {
+            sourceId: feature.properties?.id,
+            layerId: `${feature.properties?.id}-fill`,
+            borderId: `${feature.properties?.id}-border`,
+            coordinates:
+              feature.geometry.type === "Polygon"
+                ? feature.geometry.coordinates
+                : [],
+          };
+        })}
         initialLng={swedenPosition.lng}
         initialLat={swedenPosition.lat}
         initialZoom={defaultZoom}
