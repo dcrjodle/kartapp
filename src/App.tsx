@@ -1,5 +1,5 @@
 import React from "react";
-import CustomMap from "./components/Sweden";
+import CustomMap from "./components/CustomMap";
 import { swedenData } from "./data/sweden";
 
 const App: React.FC = () => {

@@ -8,7 +8,7 @@ module.exports = {
     filename: 'bundle.js',
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.scss', '.css'],
   },
   module: {
     rules: [
@@ -16,6 +16,14 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader'
+        ],
       },
       {
         test: /\.css$/,
@@ -31,7 +39,7 @@ module.exports = {
   devServer: {
     static: path.join(__dirname, 'dist'),
     compress: true,
-    port: 3000,
+    port: 3001,
     open: true,
   },
   mode: 'development',
