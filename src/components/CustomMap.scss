@@ -15,8 +15,8 @@ $county-fill: #4a90e2;
 $county-stroke: #2c5aa0;
 $detailed-county-fill: #e74c3c;
 $detailed-county-stroke: #c0392b;
-$province-fill: #4CAF50;
-$province-stroke: #388E3C;
+$province-fill: #4a90e2;
+$province-stroke: #2c5aa0;
 $sweden-border-color: #2c3e50;
 
 $control-background: white;
@@ -105,23 +105,9 @@ $button-text: white;
     }
   }
 
-  &__detailed-county {
-    fill: $detailed-county-fill;
-    fill-opacity: 0.3;
-    stroke: $detailed-county-stroke;
-    stroke-width: 2;
-    stroke-dasharray: 5, 5;
-    cursor: pointer;
-    transition: fill-opacity 0.2s ease;
-
-    &:hover {
-      fill-opacity: 0.5;
-    }
-  }
-
   &__province {
     fill: $province-fill;
-    fill-opacity: 0.1;
+    fill-opacity: 0.7;
     stroke: $province-stroke;
     stroke-width: 1;
     stroke-dasharray: 3, 3;
@@ -129,7 +115,7 @@ $button-text: white;
     transition: fill-opacity 0.2s ease;
 
     &:hover {
-      fill-opacity: 0.2;
+      fill-opacity: 0.9;
     }
   }
 

@@ -52,7 +52,7 @@ interface CustomMapProps {
  * CustomMap - Interactive geographic map component
  */
 const CustomMap: React.FC<CustomMapProps> = ({
-  provinces: counties,
+  provinces,
   gridInterval = 2,
   initialZoom = 1,
   minZoom = 0.1,
@@ -72,9 +72,9 @@ const CustomMap: React.FC<CustomMapProps> = ({
   // Memoized calculations for performance
   const bounds: Bounds = useMemo(() => {
     // Include Sweden border in bounds calculation for proper scaling
-    const allFeatures = [...counties, swedenBorderData];
+    const allFeatures = [...provinces, swedenBorderData];
     return calculateGeographicBounds(allFeatures);
-  }, [counties]);
+  }, [provinces]);
 
   const mapDimensions: MapDimensions = useMemo(
     () => calculateMapDimensions(bounds),
@@ -90,12 +90,12 @@ const CustomMap: React.FC<CustomMapProps> = ({
   }));
 
   // Pre-calculate all county SVG paths for performance
-  const countyPaths = useMemo(
+  const provincePaths = useMemo(
     () =>
-      counties.map((county) =>
-        polygonToSVGPath(county.coordinates, bounds, mapDimensions)
+      provinces.map((province) =>
+        polygonToSVGPath(province.coordinates, bounds, mapDimensions)
       ),
-    [counties, bounds, mapDimensions]
+    [provinces, bounds, mapDimensions]
   );
 
   // Pre-calculate Sweden border path
@@ -256,14 +256,14 @@ const CustomMap: React.FC<CustomMapProps> = ({
           <title>Sweden Border</title>
         </path>
 
-        {/* County polygons (top layer) */}
-        {countyPaths.map((pathData, index) => (
+        {/* Province polygons (top layer) */}
+        {provincePaths.map((pathData, index) => (
           <path
-            key={counties[index].id || index}
+            key={provinces[index].id || index}
             d={pathData}
-            className="custom-map__county"
+            className="custom-map__province"
           >
-            <title>{counties[index].name}</title>
+            <title>{provinces[index].name}</title>
           </path>
         ))}
       </svg>
@@ -273,7 +273,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
         <div className="custom-map__info">
           <div className="custom-map__info-item">Zoom: {zoom.toFixed(2)}</div>
           <div className="custom-map__info-item">
-            Counties: {counties.length}
+            Counties: {provinces.length}
           </div>
           <div className="custom-map__info-item">
             Bounds: {bounds.minLat.toFixed(1)}°-{bounds.maxLat.toFixed(1)}°N,{" "}
