@@ -65,6 +65,10 @@ $button-text: white;
     &--grab {
       cursor: grab;
     }
+    
+    &--no-zoom {
+      cursor: default;
+    }
   }
 
   // Grid pattern definitions
@@ -112,10 +116,23 @@ $button-text: white;
     stroke-width: 1;
     stroke-dasharray: 3, 3;
     cursor: pointer;
-    transition: fill-opacity 0.2s ease;
+    transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
 
     &:hover {
       fill-opacity: 0.9;
+      stroke-width: 2;
+    }
+
+    &--selected {
+      fill-opacity: 0.9;
+      stroke-width: 2;
+      stroke: #e67e22;
+      stroke-dasharray: none;
+      
+      &:hover {
+        fill-opacity: 1;
+        stroke-width: 3;
+      }
     }
   }
 
@@ -154,6 +171,21 @@ $button-text: white;
         margin-bottom: 0;
       }
     }
+  }
+
+  // Zoom disabled indicator
+  &__zoom-disabled {
+    color: #999;
+    font-style: italic;
+    font-size: 10px;
+  }
+
+  // Button container
+  &__buttons {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   // Reset button
@@ -233,6 +265,10 @@ $button-text: white;
     &__province {
       stroke-width: 2;
       stroke-dasharray: none;
+
+      &--selected {
+        stroke-width: 4;
+      }
     }
 
     &__sweden-border {

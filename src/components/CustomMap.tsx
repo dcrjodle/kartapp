@@ -68,13 +68,19 @@ const CustomMap: React.FC<CustomMapProps> = ({
     y: 0,
   });
   const [zoom, setZoom] = useState(initialZoom);
+  const [selectedProvince, setSelectedProvince] = useState<Provinces | null>(null);
+  const [showOnlySelected, setShowOnlySelected] = useState(false);
 
   // Memoized calculations for performance
   const bounds: Bounds = useMemo(() => {
+    if (showOnlySelected && selectedProvince) {
+      // Calculate bounds for only the selected province
+      return calculateGeographicBounds([selectedProvince]);
+    }
     // Include Sweden border in bounds calculation for proper scaling
     const allFeatures = [...provinces, swedenBorderData];
     return calculateGeographicBounds(allFeatures);
-  }, [provinces]);
+  }, [provinces, selectedProvince, showOnlySelected]);
 
   const mapDimensions: MapDimensions = useMemo(
     () => calculateMapDimensions(bounds),
@@ -82,12 +88,12 @@ const CustomMap: React.FC<CustomMapProps> = ({
   );
 
   // Initialize viewBox with proper dimensions
-  const [viewBox, setViewBox] = useState<ViewBox>(() => ({
+  const [viewBox, setViewBox] = useState<ViewBox>({
     x: 0,
     y: 0,
-    width: mapDimensions.width,
-    height: mapDimensions.height,
-  }));
+    width: 1000,
+    height: 1000,
+  });
 
   // Pre-calculate all county SVG paths for performance
   const provincePaths = useMemo(
@@ -119,9 +125,13 @@ const CustomMap: React.FC<CustomMapProps> = ({
    * Handle mouse down event to start dragging
    */
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Disable panning when showing only selected province
+    if (showOnlySelected && selectedProvince) {
+      return;
+    }
     setIsDragging(true);
     setLastMousePos({ x: e.clientX, y: e.clientY });
-  }, []);
+  }, [showOnlySelected, selectedProvince]);
 
   /**
    * Handle mouse move event for panning
@@ -153,6 +163,11 @@ const CustomMap: React.FC<CustomMapProps> = ({
     (e: WheelEvent) => {
       e.preventDefault();
 
+      // Disable zoom when showing only selected province
+      if (showOnlySelected && selectedProvince) {
+        return;
+      }
+
       const zoomFactor = calculateZoomFactor(e.deltaY);
       const newZoom = constrainZoom(zoom * zoomFactor, minZoom, maxZoom);
       setZoom(newZoom);
@@ -165,21 +180,44 @@ const CustomMap: React.FC<CustomMapProps> = ({
         );
       }
     },
-    [zoom, minZoom, maxZoom]
+    [zoom, minZoom, maxZoom, showOnlySelected, selectedProvince]
   );
 
   /**
-   * Reset view to initial position and zoom
+   * Handle province click - zoom to province and optionally show only that province
+   */
+  const handleProvinceClick = useCallback((province: Provinces, index: number) => {
+    // Don't handle click if currently dragging
+    if (isDragging) return;
+    
+    setSelectedProvince(province);
+    setShowOnlySelected(true);
+    
+    // Reset zoom when switching to single province view
+    setZoom(initialZoom);
+    
+    // The bounds and viewBox will automatically update due to the useMemo dependencies
+  }, [isDragging, initialZoom]);
+
+  /**
+   * Reset view to show all provinces
    */
   const resetView = useCallback(() => {
+    setSelectedProvince(null);
+    setShowOnlySelected(false);
+    setZoom(initialZoom);
+    // Don't set viewBox here - let it be recalculated when bounds change
+  }, [initialZoom]);
+
+  // Update viewBox when bounds change (when switching between views)
+  useEffect(() => {
     setViewBox({
       x: 0,
       y: 0,
       width: mapDimensions.width,
       height: mapDimensions.height,
     });
-    setZoom(initialZoom);
-  }, [mapDimensions, initialZoom]);
+  }, [mapDimensions]);
 
   // Set up wheel event listener with passive: false to enable preventDefault
   useEffect(() => {
@@ -192,7 +230,11 @@ const CustomMap: React.FC<CustomMapProps> = ({
 
   // Dynamic CSS classes for cursor state
   const svgClasses = `custom-map__svg ${
-    isDragging ? "custom-map__svg--grabbing" : "custom-map__svg--grab"
+    isDragging 
+      ? "custom-map__svg--grabbing" 
+      : showOnlySelected && selectedProvince
+        ? "custom-map__svg--no-zoom"
+        : "custom-map__svg--grab"
   }`;
 
   return (
@@ -257,37 +299,65 @@ const CustomMap: React.FC<CustomMapProps> = ({
         </path>
 
         {/* Province polygons (top layer) */}
-        {provincePaths.map((pathData, index) => (
-          <path
-            key={provinces[index].id || index}
-            d={pathData}
-            className="custom-map__province"
-          >
-            <title>{provinces[index].name}</title>
-          </path>
-        ))}
+        {(showOnlySelected && selectedProvince 
+          ? [selectedProvince]
+          : provinces
+        ).map((province, displayIndex) => {
+          const originalIndex = showOnlySelected && selectedProvince
+            ? provinces.findIndex(p => p.id === province.id)
+            : displayIndex;
+          const pathData = showOnlySelected && selectedProvince
+            ? polygonToSVGPath(province.coordinates, bounds, mapDimensions)
+            : provincePaths[originalIndex];
+          
+          return (
+            <path
+              key={province.id || originalIndex}
+              d={pathData}
+              className={`custom-map__province ${
+                selectedProvince?.id === province.id ? 'custom-map__province--selected' : ''
+              }`}
+              onClick={() => handleProvinceClick(province, originalIndex)}
+            >
+              <title>{province.name}</title>
+            </path>
+          );
+        })}
       </svg>
 
       {/* Control panel */}
       <div className="custom-map__controls">
         <div className="custom-map__info">
-          <div className="custom-map__info-item">Zoom: {zoom.toFixed(2)}</div>
           <div className="custom-map__info-item">
-            Counties: {provinces.length}
+            Zoom: {zoom.toFixed(2)}
+            {showOnlySelected && selectedProvince && (
+              <span className="custom-map__zoom-disabled"> (disabled)</span>
+            )}
           </div>
+          {selectedProvince && showOnlySelected ? (
+            <div className="custom-map__info-item">
+              Selected: {selectedProvince.name}
+            </div>
+          ) : (
+            <div className="custom-map__info-item">
+              Provinces: {provinces.length}
+            </div>
+          )}
           <div className="custom-map__info-item">
             Bounds: {bounds.minLat.toFixed(1)}°-{bounds.maxLat.toFixed(1)}°N,{" "}
             {bounds.minLng.toFixed(1)}°-{bounds.maxLng.toFixed(1)}°E
           </div>
         </div>
-        <button
-          onClick={resetView}
-          className="custom-map__reset-button"
-          type="button"
-          aria-label="Reset map view to initial position"
-        >
-          Reset View
-        </button>
+        <div className="custom-map__buttons">
+          <button
+            onClick={resetView}
+            className="custom-map__reset-button"
+            type="button"
+            aria-label={selectedProvince && showOnlySelected ? "Show all provinces" : "Reset map view to initial position"}
+          >
+            {selectedProvince && showOnlySelected ? "Show All" : "Reset View"}
+          </button>
+        </div>
       </div>
     </div>
   );
