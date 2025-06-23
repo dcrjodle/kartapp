@@ -7,32 +7,21 @@
  * @author Generated with Claude Code
  */
 
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-  useEffect,
-} from "react";
-import {
-  calculateGeographicBounds,
-  calculateMapDimensions,
-  polygonToSVGPath,
-  generateMeridians,
-  generateParallels,
-  type Provinces,
-  type Bounds,
-  type MapDimensions,
-} from "../utils/mapProjection";
+import React, { useEffect, useCallback } from "react";
+import { type Provinces } from "../utils/mapProjection";
+import { polygonToSVGPath } from "../utils/mapProjection";
 import { swedenBorderData } from "../data/sweden_border";
+import { useMapState } from "../hooks/useMapState";
+import { useMapInteractions } from "../hooks/useMapInteractions";
+import { useMapKeyboard } from "../hooks/useMapKeyboard";
 import {
-  calculateZoomFactor,
-  constrainZoom,
-  calculateZoomedViewBox,
-  calculatePannedViewBox,
-  type ViewBox,
-  type MousePosition,
-} from "../utils/mapInteractions";
+  useMapBounds,
+  useMapDimensions,
+  useProvincePaths,
+  useSwedenBorderPath,
+  useGridLines,
+  createResetViewFunction,
+} from "../utils/mapCalculations";
 import "./CustomMap.scss";
 
 interface CustomMapProps {
@@ -58,209 +47,54 @@ const CustomMap: React.FC<CustomMapProps> = ({
   minZoom = 0.1,
   maxZoom = 2,
 }) => {
-  // Refs
-  const svgRef = useRef<SVGSVGElement>(null);
+  // Custom hooks for state management
+  const mapState = useMapState(initialZoom);
+  const {
+    isDragging,
+    zoom,
+    viewBox,
+    selectedProvince,
+    showOnlySelected,
+    setViewBox,
+    resetState,
+  } = mapState;
 
-  // State management
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
-  const [lastMousePos, setLastMousePos] = useState<MousePosition>({
-    x: 0,
-    y: 0,
+  // Map calculations using custom hooks
+  const bounds = useMapBounds(provinces, swedenBorderData, selectedProvince, showOnlySelected);
+  const mapDimensions = useMapDimensions(bounds);
+  const provincePaths = useProvincePaths(provinces, bounds, mapDimensions);
+  const swedenBorderPath = useSwedenBorderPath(swedenBorderData, bounds, mapDimensions);
+  const { meridians, parallels } = useGridLines(bounds, mapDimensions, gridInterval);
+
+
+  // Create reset function
+  const resetView = useCallback(
+    createResetViewFunction(provinces, swedenBorderData, initialZoom, resetState, setViewBox),
+    [provinces, initialZoom, resetState, setViewBox]
+  );
+
+  // Map interactions using custom hook
+  const {
+    svgRef,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleWheel,
+    handleProvinceClick,
+  } = useMapInteractions({
+    ...mapState,
+    minZoom,
+    maxZoom,
+    initialZoom,
   });
-  const [zoom, setZoom] = useState(initialZoom);
-  const [selectedProvince, setSelectedProvince] = useState<Provinces | null>(
-    null
-  );
-  const [showOnlySelected, setShowOnlySelected] = useState(false);
 
-
-  // Memoized calculations for performance
-  const bounds: Bounds = useMemo(() => {
-    if (showOnlySelected && selectedProvince) {
-      // Calculate bounds for only the selected province
-      return calculateGeographicBounds([selectedProvince]);
-    }
-    // Include Sweden border in bounds calculation for proper scaling
-    const allFeatures = [...provinces, swedenBorderData];
-    return calculateGeographicBounds(allFeatures);
-  }, [provinces, selectedProvince, showOnlySelected]);
-
-  const mapDimensions: MapDimensions = useMemo(
-    () => calculateMapDimensions(bounds),
-    [bounds]
-  );
-
-  // Initialize viewBox with proper dimensions
-  const [viewBox, setViewBox] = useState<ViewBox>({
-    x: 0,
-    y: 0,
-    width: 1000,
-    height: 1000,
+  // Keyboard interactions using custom hook
+  useMapKeyboard({
+    selectedProvince,
+    showOnlySelected,
+    resetView,
   });
 
-  // Pre-calculate all county SVG paths for performance
-  const provincePaths = useMemo(
-    () =>
-      provinces.map((province) =>
-        polygonToSVGPath(province.coordinates, bounds, mapDimensions)
-      ),
-    [provinces, bounds, mapDimensions]
-  );
-
-  // Pre-calculate Sweden border path
-  const swedenBorderPath = useMemo(
-    () => polygonToSVGPath(swedenBorderData.coordinates, bounds, mapDimensions),
-    [bounds, mapDimensions]
-  );
-
-  // Generate grid lines
-  const meridians = useMemo(
-    () => generateMeridians(bounds, mapDimensions, gridInterval),
-    [bounds, mapDimensions, gridInterval]
-  );
-
-  const parallels = useMemo(
-    () => generateParallels(bounds, mapDimensions, gridInterval),
-    [bounds, mapDimensions, gridInterval]
-  );
-
-
-  /**
-   * Handle mouse down event to start dragging
-   */
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      // Disable panning when showing only selected province
-      if (showOnlySelected && selectedProvince) {
-        return;
-      }
-      setIsDragging(true);
-      setHasDragged(false);
-      setLastMousePos({ x: e.clientX, y: e.clientY });
-    },
-    [showOnlySelected, selectedProvince]
-  );
-
-  /**
-   * Handle mouse move event for panning
-   */
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!isDragging) return;
-
-      const deltaX = e.clientX - lastMousePos.x;
-      const deltaY = e.clientY - lastMousePos.y;
-
-      // Mark as dragged if there's significant movement
-      if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
-        setHasDragged(true);
-      }
-
-      setViewBox((prev) => {
-        const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY);
-
-
-        return newViewBox;
-      });
-
-      setLastMousePos({ x: e.clientX, y: e.clientY });
-    },
-    [isDragging, lastMousePos]
-  );
-
-  /**
-   * Handle mouse up event to stop dragging
-   */
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  /**
-   * Handle wheel event for zooming with proper event prevention
-   */
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      e.preventDefault();
-
-      // Disable zoom when showing only selected province
-      if (showOnlySelected && selectedProvince) {
-        return;
-      }
-
-      const zoomFactor = calculateZoomFactor(e.deltaY);
-      const newZoom = constrainZoom(zoom * zoomFactor, minZoom, maxZoom);
-
-      // Only proceed if zoom actually changed
-      if (newZoom !== zoom) {
-        setZoom(newZoom);
-
-        const rect = svgRef.current?.getBoundingClientRect();
-        if (rect) {
-          const mousePosition: MousePosition = { x: e.clientX, y: e.clientY };
-          setViewBox((prev) => {
-            const newViewBox = calculateZoomedViewBox(
-              prev,
-              zoomFactor,
-              mousePosition,
-              rect
-            );
-            return newViewBox;
-          });
-        }
-      }
-    },
-    [
-      zoom,
-      minZoom,
-      maxZoom,
-      showOnlySelected,
-      selectedProvince,
-    ]
-  );
-
-
-  /**
-   * Handle province click - zoom to province and optionally show only that province
-   */
-  const handleProvinceClick = useCallback(
-    (province: Provinces, _index: number) => {
-      // Don't handle click if we just finished dragging
-      if (hasDragged) return;
-
-      setSelectedProvince(province);
-      setShowOnlySelected(true);
-
-      // Reset zoom when switching to single province view
-      setZoom(initialZoom);
-
-      // The bounds and viewBox will automatically update due to the useMemo dependencies
-    },
-    [hasDragged, initialZoom]
-  );
-
-  /**
-   * Reset view to show all provinces
-   */
-  const resetView = useCallback(() => {
-    setSelectedProvince(null);
-    setShowOnlySelected(false);
-    setZoom(initialZoom);
-    
-    // Force recalculation by setting a timeout to let bounds/mapDimensions update first
-    setTimeout(() => {
-      const allFeatures = [...provinces, swedenBorderData];
-      const resetBounds = calculateGeographicBounds(allFeatures);
-      const resetDimensions = calculateMapDimensions(resetBounds);
-      
-      setViewBox({
-        x: 0,
-        y: 0,
-        width: resetDimensions.width,
-        height: resetDimensions.height,
-      });
-    }, 0);
-  }, [initialZoom, provinces]);
 
   // Update viewBox when bounds change (when switching between views)
   useEffect(() => {
@@ -270,7 +104,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
       width: mapDimensions.width,
       height: mapDimensions.height,
     });
-  }, [mapDimensions]);
+  }, [mapDimensions, setViewBox]);
 
   // Set up wheel event listener with passive: false to enable preventDefault
   useEffect(() => {
@@ -280,18 +114,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
       return () => svg.removeEventListener("wheel", handleWheel);
     }
   }, [handleWheel]);
-
-  // Set up escape key listener to exit selected province
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && selectedProvince && showOnlySelected) {
-        resetView();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedProvince, showOnlySelected, resetView]);
 
   // Dynamic CSS classes for cursor state
   const svgClasses = `custom-map__svg ${
