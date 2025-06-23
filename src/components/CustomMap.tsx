@@ -44,7 +44,7 @@ interface CustomMapProps {
   initialZoom?: number;
   /** Minimum allowed zoom level (default: 0.1) */
   minZoom?: number;
-  /** Maximum allowed zoom level (default: 10) */
+  /** Maximum allowed zoom level (default: 5) */
   maxZoom?: number;
 }
 
@@ -56,36 +56,24 @@ const CustomMap: React.FC<CustomMapProps> = ({
   gridInterval = 2,
   initialZoom = 1,
   minZoom = 0.1,
-  maxZoom = 10,
+  maxZoom = 2,
 }) => {
   // Refs
   const svgRef = useRef<SVGSVGElement>(null);
 
   // State management
   const [isDragging, setIsDragging] = useState(false);
+  const [hasDragged, setHasDragged] = useState(false);
   const [lastMousePos, setLastMousePos] = useState<MousePosition>({
     x: 0,
     y: 0,
   });
   const [zoom, setZoom] = useState(initialZoom);
-  const [selectedProvince, setSelectedProvince] = useState<Provinces | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState<Provinces | null>(
+    null
+  );
   const [showOnlySelected, setShowOnlySelected] = useState(false);
-  
-  // Cloud parallax state
-  const [cloudOffset, setCloudOffset] = useState({ x: 0, y: 0 });
-  
-  // Generate random cloud positions (only once)
-  const clouds = useMemo(() => {
-    const cloudCount = 15;
-    return Array.from({ length: cloudCount }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100, // Percentage of map width
-      y: Math.random() * 100, // Percentage of map height
-      size: 0.5 + Math.random() * 1.5, // Random size between 0.5 and 2
-      opacity: 0.3 + Math.random() * 0.4, // Random opacity between 0.3 and 0.7
-      type: Math.floor(Math.random() * 3), // Random cloud shape (0, 1, or 2)
-    }));
-  }, []);
+
 
   // Memoized calculations for performance
   const bounds: Bounds = useMemo(() => {
@@ -137,50 +125,22 @@ const CustomMap: React.FC<CustomMapProps> = ({
     [bounds, mapDimensions, gridInterval]
   );
 
-  /**
-   * Calculate pan limits to prevent scrolling too far outside map bounds
-   */
-  const calculatePanLimits = useCallback(() => {
-    // Allow some padding around the map (percentage of map dimensions)
-    const paddingFactor = 0.2; // 20% padding
-    const padding = {
-      x: mapDimensions.width * paddingFactor,
-      y: mapDimensions.height * paddingFactor
-    };
-
-    return {
-      minX: -padding.x,
-      maxX: padding.x,
-      minY: -padding.y,
-      maxY: padding.y
-    };
-  }, [mapDimensions]);
-
-  /**
-   * Constrain viewBox to stay within pan limits
-   */
-  const constrainViewBox = useCallback((newViewBox: ViewBox) => {
-    const limits = calculatePanLimits();
-    
-    return {
-      x: Math.max(limits.minX, Math.min(limits.maxX, newViewBox.x)),
-      y: Math.max(limits.minY, Math.min(limits.maxY, newViewBox.y)),
-      width: newViewBox.width,
-      height: newViewBox.height
-    };
-  }, [calculatePanLimits]);
 
   /**
    * Handle mouse down event to start dragging
    */
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Disable panning when showing only selected province
-    if (showOnlySelected && selectedProvince) {
-      return;
-    }
-    setIsDragging(true);
-    setLastMousePos({ x: e.clientX, y: e.clientY });
-  }, [showOnlySelected, selectedProvince]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      // Disable panning when showing only selected province
+      if (showOnlySelected && selectedProvince) {
+        return;
+      }
+      setIsDragging(true);
+      setHasDragged(false);
+      setLastMousePos({ x: e.clientX, y: e.clientY });
+    },
+    [showOnlySelected, selectedProvince]
+  );
 
   /**
    * Handle mouse move event for panning
@@ -192,22 +152,21 @@ const CustomMap: React.FC<CustomMapProps> = ({
       const deltaX = e.clientX - lastMousePos.x;
       const deltaY = e.clientY - lastMousePos.y;
 
+      // Mark as dragged if there's significant movement
+      if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+        setHasDragged(true);
+      }
+
       setViewBox((prev) => {
         const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY);
-        // Apply pan limits to constrain the viewBox
-        return constrainViewBox(newViewBox);
+
+
+        return newViewBox;
       });
-      
-      // Update cloud parallax offset (clouds move slower - parallax effect)
-      const parallaxFactor = 0.3; // Clouds move at 30% of map movement speed
-      setCloudOffset(prev => ({
-        x: prev.x + deltaX * parallaxFactor,
-        y: prev.y + deltaY * parallaxFactor
-      }));
-      
+
       setLastMousePos({ x: e.clientX, y: e.clientY });
     },
-    [isDragging, lastMousePos, constrainViewBox]
+    [isDragging, lastMousePos]
   );
 
   /**
@@ -231,74 +190,54 @@ const CustomMap: React.FC<CustomMapProps> = ({
 
       const zoomFactor = calculateZoomFactor(e.deltaY);
       const newZoom = constrainZoom(zoom * zoomFactor, minZoom, maxZoom);
-      setZoom(newZoom);
 
-      const rect = svgRef.current?.getBoundingClientRect();
-      if (rect) {
-        const mousePosition: MousePosition = { x: e.clientX, y: e.clientY };
-        setViewBox((prev) => {
-          const newViewBox = calculateZoomedViewBox(prev, zoomFactor, mousePosition, rect);
-          // Apply pan limits after zooming
-          return constrainViewBox(newViewBox);
-        });
+      // Only proceed if zoom actually changed
+      if (newZoom !== zoom) {
+        setZoom(newZoom);
+
+        const rect = svgRef.current?.getBoundingClientRect();
+        if (rect) {
+          const mousePosition: MousePosition = { x: e.clientX, y: e.clientY };
+          setViewBox((prev) => {
+            const newViewBox = calculateZoomedViewBox(
+              prev,
+              zoomFactor,
+              mousePosition,
+              rect
+            );
+            return newViewBox;
+          });
+        }
       }
     },
-    [zoom, minZoom, maxZoom, showOnlySelected, selectedProvince, constrainViewBox]
+    [
+      zoom,
+      minZoom,
+      maxZoom,
+      showOnlySelected,
+      selectedProvince,
+    ]
   );
 
-  /**
-   * Render a cloud shape based on type
-   */
-  const renderCloudShape = useCallback((type: number) => {
-    switch (type) {
-      case 0:
-        return (
-          <g>
-            <circle cx="25" cy="25" r="10"/>
-            <circle cx="35" cy="20" r="12"/>
-            <circle cx="45" cy="25" r="8"/>
-            <circle cx="15" cy="20" r="8"/>
-            <circle cx="40" cy="35" r="6"/>
-          </g>
-        );
-      case 1:
-        return (
-          <g>
-            <circle cx="20" cy="30" r="12"/>
-            <circle cx="35" cy="25" r="15"/>
-            <circle cx="50" cy="30" r="10"/>
-            <circle cx="30" cy="15" r="8"/>
-          </g>
-        );
-      case 2:
-      default:
-        return (
-          <g>
-            <circle cx="30" cy="25" r="14"/>
-            <circle cx="15" cy="30" r="9"/>
-            <circle cx="45" cy="30" r="11"/>
-            <circle cx="25" cy="15" r="7"/>
-            <circle cx="40" cy="18" r="6"/>
-          </g>
-        );
-    }
-  }, []);
 
   /**
    * Handle province click - zoom to province and optionally show only that province
    */
-  const handleProvinceClick = useCallback((province: Provinces, _index: number) => {
-    // Don't handle click if currently dragging
-    if (isDragging) return;
-    
-    setSelectedProvince(province);
-    setShowOnlySelected(true);
-    
-    // Reset zoom when switching to single province view
-    setZoom(initialZoom);
-    
-    // The bounds and viewBox will automatically update due to the useMemo dependencies
-  }, [isDragging, initialZoom]);
+  const handleProvinceClick = useCallback(
+    (province: Provinces, _index: number) => {
+      // Don't handle click if we just finished dragging
+      if (hasDragged) return;
+
+      setSelectedProvince(province);
+      setShowOnlySelected(true);
+
+      // Reset zoom when switching to single province view
+      setZoom(initialZoom);
+
+      // The bounds and viewBox will automatically update due to the useMemo dependencies
+    },
+    [hasDragged, initialZoom]
+  );
 
   /**
    * Reset view to show all provinces
@@ -307,9 +246,21 @@ const CustomMap: React.FC<CustomMapProps> = ({
     setSelectedProvince(null);
     setShowOnlySelected(false);
     setZoom(initialZoom);
-    setCloudOffset({ x: 0, y: 0 }); // Reset cloud positions
-    // Don't set viewBox here - let it be recalculated when bounds change
-  }, [initialZoom]);
+    
+    // Force recalculation by setting a timeout to let bounds/mapDimensions update first
+    setTimeout(() => {
+      const allFeatures = [...provinces, swedenBorderData];
+      const resetBounds = calculateGeographicBounds(allFeatures);
+      const resetDimensions = calculateMapDimensions(resetBounds);
+      
+      setViewBox({
+        x: 0,
+        y: 0,
+        width: resetDimensions.width,
+        height: resetDimensions.height,
+      });
+    }, 0);
+  }, [initialZoom, provinces]);
 
   // Update viewBox when bounds change (when switching between views)
   useEffect(() => {
@@ -330,13 +281,25 @@ const CustomMap: React.FC<CustomMapProps> = ({
     }
   }, [handleWheel]);
 
+  // Set up escape key listener to exit selected province
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && selectedProvince && showOnlySelected) {
+        resetView();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [selectedProvince, showOnlySelected, resetView]);
+
   // Dynamic CSS classes for cursor state
   const svgClasses = `custom-map__svg ${
-    isDragging 
-      ? "custom-map__svg--grabbing" 
+    isDragging
+      ? "custom-map__svg--grabbing"
       : showOnlySelected && selectedProvince
-        ? "custom-map__svg--no-zoom"
-        : "custom-map__svg--grab"
+      ? "custom-map__svg--no-zoom"
+      : "custom-map__svg--grab"
   }`;
 
   return (
@@ -400,24 +363,29 @@ const CustomMap: React.FC<CustomMapProps> = ({
           <title>Sweden Border</title>
         </path>
 
+
         {/* Province polygons (top layer) */}
-        {(showOnlySelected && selectedProvince 
+        {(showOnlySelected && selectedProvince
           ? [selectedProvince]
           : provinces
         ).map((province, displayIndex) => {
-          const originalIndex = showOnlySelected && selectedProvince
-            ? provinces.findIndex(p => p.id === province.id)
-            : displayIndex;
-          const pathData = showOnlySelected && selectedProvince
-            ? polygonToSVGPath(province.coordinates, bounds, mapDimensions)
-            : provincePaths[originalIndex];
-          
+          const originalIndex =
+            showOnlySelected && selectedProvince
+              ? provinces.findIndex((p) => p.id === province.id)
+              : displayIndex;
+          const pathData =
+            showOnlySelected && selectedProvince
+              ? polygonToSVGPath(province.coordinates, bounds, mapDimensions)
+              : provincePaths[originalIndex];
+
           return (
             <path
               key={province.id || originalIndex}
               d={pathData}
               className={`custom-map__province ${
-                selectedProvince?.id === province.id ? 'custom-map__province--selected' : ''
+                selectedProvince?.id === province.id
+                  ? "custom-map__province--selected"
+                  : ""
               }`}
               onClick={() => handleProvinceClick(province, originalIndex)}
             >
@@ -427,43 +395,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
         })}
       </svg>
 
-      {/* Cloud layer with parallax effect */}
-      <div 
-        className="custom-map__clouds"
-        style={{
-          transform: `translate(${Math.round(cloudOffset.x) || 0}px, ${Math.round(cloudOffset.y) || 0}px)`,
-        }}
-      >
-        <svg 
-          className="custom-map__clouds-svg"
-          viewBox={`0 0 ${mapDimensions.width} ${mapDimensions.height}`}
-        >
-          <defs>
-            <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="1"/>
-            </filter>
-          </defs>
-          {clouds.map((cloud) => {
-            // Calculate absolute positions based on current map dimensions
-            const x = Math.round((cloud.x / 100) * mapDimensions.width) || 0;
-            const y = Math.round((cloud.y / 100) * mapDimensions.height) || 0;
-            const size = Math.max(0.1, Math.min(3, cloud.size || 1)); // Clamp size between 0.1 and 3
-            const opacity = Math.max(0, Math.min(1, cloud.opacity || 0.5)); // Clamp opacity between 0 and 1
-            
-            return (
-              <g
-                key={cloud.id}
-                transform={`translate(${x}, ${y}) scale(${size})`}
-                opacity={opacity}
-                className="custom-map__cloud"
-                filter="url(#cloudBlur)"
-              >
-                {renderCloudShape(cloud.type)}
-              </g>
-            );
-          })}
-        </svg>
-      </div>
 
       {/* Control panel */}
       <div className="custom-map__controls">
@@ -496,7 +427,11 @@ const CustomMap: React.FC<CustomMapProps> = ({
             onClick={resetView}
             className="custom-map__reset-button"
             type="button"
-            aria-label={selectedProvince && showOnlySelected ? "Show all provinces" : "Reset map view to initial position"}
+            aria-label={
+              selectedProvince && showOnlySelected
+                ? "Show all provinces"
+                : "Reset map view to initial position"
+            }
           >
             {selectedProvince && showOnlySelected ? "Show All" : "Reset View"}
           </button>
