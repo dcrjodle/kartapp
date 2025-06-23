@@ -11,6 +11,7 @@ import React, { useEffect, useCallback } from "react";
 import { type Provinces } from "../utils/mapProjection";
 import { polygonToSVGPath } from "../utils/mapProjection";
 import { swedenBorderData } from "../data/sweden_border";
+import { countiesData } from "../data/detailed_counties";
 import { useMapState } from "../hooks/useMapState";
 import { useMapInteractions } from "../hooks/useMapInteractions";
 import { useMapKeyboard } from "../hooks/useMapKeyboard";
@@ -55,6 +56,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
     viewBox,
     selectedProvince,
     showOnlySelected,
+    showCounties,
     setViewBox,
     resetState,
   } = mapState;
@@ -78,6 +80,11 @@ const CustomMap: React.FC<CustomMapProps> = ({
     mapDimensions,
     gridInterval
   );
+  
+  // Calculate county paths when counties should be displayed
+  const countyPaths = showCounties && selectedProvince 
+    ? countiesData.map(county => polygonToSVGPath(county.coordinates, bounds, mapDimensions))
+    : [];
 
   // Create reset function
   const resetView = useCallback(
@@ -231,6 +238,17 @@ const CustomMap: React.FC<CustomMapProps> = ({
             </path>
           );
         })}
+
+        {/* County boundaries (when province is selected) */}
+        {showCounties && selectedProvince && countyPaths.map((pathData, index) => (
+          <path
+            key={`county-${index}`}
+            d={pathData}
+            className="custom-map__county"
+          >
+            <title>{countiesData[index]?.name || `County ${index + 1}`}</title>
+          </path>
+        ))}
       </svg>
 
       {/* Control panel */}
