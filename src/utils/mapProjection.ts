@@ -14,7 +14,7 @@ export interface MapDimensions {
   height: number;
 }
 
-export interface Municipality {
+export interface Provinces {
   coordinates: number[][] | number[][][][];
   name?: string;
   id?: string;
@@ -26,25 +26,23 @@ export interface Municipality {
 export const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
 
 /**
- * Calculate the geographic bounds of a collection of municipalities
+ * Calculate the geographic bounds of a collection of counties
  */
-export const calculateGeographicBounds = (
-  municipalities: Municipality[]
-): Bounds => {
+export const calculateGeographicBounds = (counties: Provinces[]): Bounds => {
   let minLng = Infinity,
     maxLng = -Infinity;
   let minLat = Infinity,
     maxLat = -Infinity;
 
-  municipalities.forEach((municipality) => {
+  counties.forEach((county) => {
     // Handle both coordinate formats: number[][] (simple polygon) and number[][][][] (MultiPolygon)
-    if (municipality.coordinates.length > 0) {
+    if (county.coordinates.length > 0) {
       // Check if it's a simple coordinate array (number[][])
-      if (typeof municipality.coordinates[0][0] === 'number') {
+      if (typeof county.coordinates[0][0] === "number") {
         // Simple polygon format: number[][]
-        const coords = municipality.coordinates as number[][];
+        const coords = county.coordinates as number[][];
         coords.forEach(([lng, lat]) => {
-          if (typeof lng === 'number' && typeof lat === 'number') {
+          if (typeof lng === "number" && typeof lat === "number") {
             minLng = Math.min(minLng, lng);
             maxLng = Math.max(maxLng, lng);
             minLat = Math.min(minLat, lat);
@@ -53,11 +51,11 @@ export const calculateGeographicBounds = (
         });
       } else {
         // MultiPolygon format: number[][][][]
-        const multiPolygon = municipality.coordinates as number[][][][];
+        const multiPolygon = county.coordinates as number[][][][];
         multiPolygon.forEach((polygon) => {
           polygon.forEach((ring) => {
             ring.forEach(([lng, lat]) => {
-              if (typeof lng === 'number' && typeof lat === 'number') {
+              if (typeof lng === "number" && typeof lat === "number") {
                 minLng = Math.min(minLng, lng);
                 maxLng = Math.max(maxLng, lng);
                 minLat = Math.min(minLat, lat);
@@ -136,15 +134,16 @@ export const polygonToSVGPath = (
   // Handle both coordinate formats
   if (coordinates.length > 0) {
     // Check if it's a simple coordinate array (number[][])
-    if (typeof coordinates[0][0] === 'number') {
+    if (typeof coordinates[0][0] === "number") {
       // Simple polygon format: number[][]
       const coords = coordinates as number[][];
-      const pathData = coords
-        .map(([lng, lat], index) => {
-          const [x, y] = projectToSVG(lng, lat, bounds, dimensions);
-          return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-        })
-        .join(" ") + " Z";
+      const pathData =
+        coords
+          .map(([lng, lat], index) => {
+            const [x, y] = projectToSVG(lng, lat, bounds, dimensions);
+            return `${index === 0 ? "M" : "L"} ${x} ${y}`;
+          })
+          .join(" ") + " Z";
       return pathData;
     } else {
       // MultiPolygon format: number[][][][]
@@ -153,12 +152,13 @@ export const polygonToSVGPath = (
         .map((polygon) => {
           return polygon
             .map((ring) => {
-              const pathData = ring
-                .map(([lng, lat], index) => {
-                  const [x, y] = projectToSVG(lng, lat, bounds, dimensions);
-                  return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-                })
-                .join(" ") + " Z";
+              const pathData =
+                ring
+                  .map(([lng, lat], index) => {
+                    const [x, y] = projectToSVG(lng, lat, bounds, dimensions);
+                    return `${index === 0 ? "M" : "L"} ${x} ${y}`;
+                  })
+                  .join(" ") + " Z";
               return pathData;
             })
             .join(" ");

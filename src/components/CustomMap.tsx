@@ -20,10 +20,11 @@ import {
   polygonToSVGPath,
   generateMeridians,
   generateParallels,
-  type Municipality,
+  type Provinces,
   type Bounds,
   type MapDimensions,
 } from "../utils/mapProjection";
+import { swedenBorderData } from "../data/sweden_border";
 import {
   calculateZoomFactor,
   constrainZoom,
@@ -35,8 +36,8 @@ import {
 import "./CustomMap.scss";
 
 interface CustomMapProps {
-  /** Array of municipality data with coordinate polygons */
-  municipalities: Municipality[];
+  /** Array of county data with coordinate polygons */
+  provinces: Provinces[];
   /** Interval in degrees for grid lines (default: 2) */
   gridInterval?: number;
   /** Initial zoom level (default: 1) */
@@ -51,7 +52,7 @@ interface CustomMapProps {
  * CustomMap - Interactive geographic map component
  */
 const CustomMap: React.FC<CustomMapProps> = ({
-  municipalities,
+  provinces: counties,
   gridInterval = 2,
   initialZoom = 1,
   minZoom = 0.1,
@@ -69,10 +70,11 @@ const CustomMap: React.FC<CustomMapProps> = ({
   const [zoom, setZoom] = useState(initialZoom);
 
   // Memoized calculations for performance
-  const bounds: Bounds = useMemo(
-    () => calculateGeographicBounds(municipalities),
-    [municipalities]
-  );
+  const bounds: Bounds = useMemo(() => {
+    // Include Sweden border in bounds calculation for proper scaling
+    const allFeatures = [...counties, swedenBorderData];
+    return calculateGeographicBounds(allFeatures);
+  }, [counties]);
 
   const mapDimensions: MapDimensions = useMemo(
     () => calculateMapDimensions(bounds),
@@ -87,13 +89,19 @@ const CustomMap: React.FC<CustomMapProps> = ({
     height: mapDimensions.height,
   }));
 
-  // Pre-calculate all municipality SVG paths for performance
-  const municipalityPaths = useMemo(
+  // Pre-calculate all county SVG paths for performance
+  const countyPaths = useMemo(
     () =>
-      municipalities.map((municipality) =>
-        polygonToSVGPath(municipality.coordinates, bounds, mapDimensions)
+      counties.map((county) =>
+        polygonToSVGPath(county.coordinates, bounds, mapDimensions)
       ),
-    [municipalities, bounds, mapDimensions]
+    [counties, bounds, mapDimensions]
+  );
+
+  // Pre-calculate Sweden border path
+  const swedenBorderPath = useMemo(
+    () => polygonToSVGPath(swedenBorderData.coordinates, bounds, mapDimensions),
+    [bounds, mapDimensions]
   );
 
   // Generate grid lines
@@ -243,14 +251,19 @@ const CustomMap: React.FC<CustomMapProps> = ({
           />
         ))}
 
-        {/* Municipality polygons */}
-        {municipalityPaths.map((pathData, index) => (
+        {/* Sweden border outline (bottom layer) */}
+        <path d={swedenBorderPath} className="custom-map__sweden-border">
+          <title>Sweden Border</title>
+        </path>
+
+        {/* County polygons (top layer) */}
+        {countyPaths.map((pathData, index) => (
           <path
-            key={municipalities[index].id || index}
+            key={counties[index].id || index}
             d={pathData}
-            className="custom-map__municipality"
+            className="custom-map__county"
           >
-            <title>{municipalities[index].name}</title>
+            <title>{counties[index].name}</title>
           </path>
         ))}
       </svg>
@@ -260,7 +273,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
         <div className="custom-map__info">
           <div className="custom-map__info-item">Zoom: {zoom.toFixed(2)}</div>
           <div className="custom-map__info-item">
-            Municipalities: {municipalities.length}
+            Counties: {counties.length}
           </div>
           <div className="custom-map__info-item">
             Bounds: {bounds.minLat.toFixed(1)}°-{bounds.maxLat.toFixed(1)}°N,{" "}

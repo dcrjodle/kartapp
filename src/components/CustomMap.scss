@@ -9,8 +9,16 @@
 $map-background: #f0f0f0;
 $grid-color: #e0e0e0;
 $grid-line-color: #ccc;
-$municipality-fill: #4a90e2;
-$municipality-stroke: #2c5aa0;
+
+// Data type colors
+$county-fill: #4a90e2;
+$county-stroke: #2c5aa0;
+$detailed-county-fill: #e74c3c;
+$detailed-county-stroke: #c0392b;
+$province-fill: #4CAF50;
+$province-stroke: #388E3C;
+$sweden-border-color: #2c3e50;
+
 $control-background: white;
 $control-shadow: rgba(0, 0, 0, 0.2);
 $control-text: #666;
@@ -83,11 +91,11 @@ $button-text: white;
     fill: none;
   }
 
-  // Municipality polygons
-  &__municipality {
-    fill: $municipality-fill;
+  // Data type styling
+  &__county {
+    fill: $county-fill;
     fill-opacity: 0.7;
-    stroke: $municipality-stroke;
+    stroke: $county-stroke;
     stroke-width: 1;
     cursor: pointer;
     transition: fill-opacity 0.2s ease;
@@ -95,6 +103,43 @@ $button-text: white;
     &:hover {
       fill-opacity: 0.9;
     }
+  }
+
+  &__detailed-county {
+    fill: $detailed-county-fill;
+    fill-opacity: 0.3;
+    stroke: $detailed-county-stroke;
+    stroke-width: 2;
+    stroke-dasharray: 5, 5;
+    cursor: pointer;
+    transition: fill-opacity 0.2s ease;
+
+    &:hover {
+      fill-opacity: 0.5;
+    }
+  }
+
+  &__province {
+    fill: $province-fill;
+    fill-opacity: 0.1;
+    stroke: $province-stroke;
+    stroke-width: 1;
+    stroke-dasharray: 3, 3;
+    cursor: pointer;
+    transition: fill-opacity 0.2s ease;
+
+    &:hover {
+      fill-opacity: 0.2;
+    }
+  }
+
+  &__sweden-border {
+    fill: none;
+    stroke: $sweden-border-color;
+    stroke-width: 1;
+    stroke-dasharray: 2, 2;
+    opacity: 0.6;
+    pointer-events: none; // Don't interfere with mouse interactions
   }
 
   // Control panel
@@ -190,8 +235,24 @@ $button-text: white;
 // High contrast mode support
 @media (prefers-contrast: high) {
   .custom-map {
-    &__municipality {
+    &__county {
       stroke-width: 2;
+    }
+
+    &__detailed-county {
+      stroke-width: 3;
+      stroke-dasharray: none;
+    }
+
+    &__province {
+      stroke-width: 2;
+      stroke-dasharray: none;
+    }
+
+    &__sweden-border {
+      stroke-width: 2;
+      stroke-dasharray: none;
+      opacity: 1;
     }
 
     &__meridian,
@@ -205,7 +266,9 @@ $button-text: white;
 // Reduced motion support
 @media (prefers-reduced-motion: reduce) {
   .custom-map {
-    &__municipality {
+    &__county,
+    &__detailed-county,
+    &__province {
       transition: none;
     }
 
