@@ -1,0 +1,304 @@
+/**
+ * CustomMap Component Styles
+ * Interactive SVG-based geographic map with pan and zoom functionality
+ */
+
+@use "sass:color";
+
+// Variables
+$map-background: #f0f0f0;
+$grid-color: #e0e0e0;
+$grid-line-color: #ccc;
+
+// Data type colors
+$county-fill: #4a90e2;
+$county-stroke: #2c5aa0;
+$detailed-county-fill: #e74c3c;
+$detailed-county-stroke: #c0392b;
+$province-fill: #4a90e2;
+$province-stroke: #2c5aa0;
+$sweden-border-color: #2c3e50;
+
+$control-background: white;
+$control-shadow: rgba(0, 0, 0, 0.2);
+$control-text: #666;
+$button-background: #4a90e2;
+$button-text: white;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin shadow-box {
+  box-shadow: 0 2px 5px $control-shadow;
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+// Main container
+.custom-map {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: $map-background;
+  overflow: hidden;
+
+  // SVG map element
+  &__svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    
+    &--grabbing {
+      cursor: grabbing !important;
+    }
+    
+    &--grab {
+      cursor: grab;
+    }
+    
+    &--no-zoom {
+      cursor: default;
+    }
+  }
+
+  // Grid pattern definitions
+  &__grid {
+    &-pattern {
+      .grid-line {
+        fill: none;
+        stroke: $grid-color;
+        stroke-width: 0.5;
+      }
+    }
+
+    &-background {
+      fill: url(#grid);
+    }
+  }
+
+  // Geographic grid lines
+  &__meridian,
+  &__parallel {
+    stroke: $grid-line-color;
+    stroke-width: 0.5;
+    stroke-dasharray: 2, 2;
+    fill: none;
+  }
+
+  // Data type styling
+  &__county {
+    fill: $county-fill;
+    fill-opacity: 0.7;
+    stroke: $county-stroke;
+    stroke-width: 1;
+    cursor: pointer;
+    transition: fill-opacity 0.2s ease;
+
+    &:hover {
+      fill-opacity: 0.9;
+    }
+  }
+
+  &__province {
+    fill: $province-fill;
+    fill-opacity: 0.7;
+    stroke: $province-stroke;
+    stroke-width: 1;
+    stroke-dasharray: 3, 3;
+    cursor: pointer;
+    transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
+
+    &:hover {
+      fill-opacity: 0.9;
+      stroke-width: 2;
+    }
+
+    &--selected {
+      fill-opacity: 0.9;
+      stroke-width: 2;
+      stroke: #e67e22;
+      stroke-dasharray: none;
+      
+      &:hover {
+        fill-opacity: 1;
+        stroke-width: 3;
+      }
+    }
+  }
+
+  &__sweden-border {
+    fill: none;
+    stroke: $sweden-border-color;
+    stroke-width: 1;
+    stroke-dasharray: 2, 2;
+    opacity: 0.6;
+    pointer-events: none; // Don't interfere with mouse interactions
+  }
+
+  // Control panel
+  &__controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: $control-background;
+    padding: 10px;
+    border-radius: 5px;
+    @include shadow-box;
+    z-index: 10;
+  }
+
+  // Control information display
+  &__info {
+    font-size: 12px;
+    color: $control-text;
+    margin-bottom: 5px;
+    line-height: 1.4;
+
+    &-item {
+      margin-bottom: 2px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // Zoom disabled indicator
+  &__zoom-disabled {
+    color: #999;
+    font-style: italic;
+    font-size: 10px;
+  }
+
+
+  // Button container
+  &__buttons {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  // Reset button
+  &__reset-button {
+    @include button-reset;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: $button-background;
+    color: $button-text;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: color.adjust($button-background, $lightness: -10%);
+    }
+
+    &:active {
+      background-color: color.adjust($button-background, $lightness: -15%);
+    }
+
+    &:focus {
+      outline: 2px solid color.adjust($button-background, $lightness: 20%);
+      outline-offset: 2px;
+    }
+  }
+}
+
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .custom-map {
+    &__controls {
+      top: 5px;
+      left: 5px;
+      padding: 8px;
+    }
+
+    &__info {
+      font-size: 11px;
+    }
+
+    &__reset-button {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-map {
+    &__controls {
+      padding: 6px;
+    }
+
+    &__info {
+      font-size: 10px;
+    }
+
+    &__reset-button {
+      padding: 3px 6px;
+      font-size: 10px;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .custom-map {
+    &__county {
+      stroke-width: 2;
+    }
+
+    &__detailed-county {
+      stroke-width: 3;
+      stroke-dasharray: none;
+    }
+
+    &__province {
+      stroke-width: 2;
+      stroke-dasharray: none;
+
+      &--selected {
+        stroke-width: 4;
+      }
+    }
+
+    &__sweden-border {
+      stroke-width: 2;
+      stroke-dasharray: none;
+      opacity: 1;
+    }
+
+    &__meridian,
+    &__parallel {
+      stroke-width: 1;
+      stroke-dasharray: none;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .custom-map {
+    &__county,
+    &__detailed-county,
+    &__province {
+      transition: none;
+    }
+
+    &__reset-button {
+      transition: none;
+    }
+
+  }
+}
