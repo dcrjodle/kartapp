@@ -78,9 +78,14 @@ export const calculateMapDimensions = (bounds: Bounds): MapDimensions => {
   const lngRange = bounds.maxLng - bounds.minLng;
   const latRange = bounds.maxLat - bounds.minLat;
 
-  // Compensation factor for latitude compression at Sweden's latitude (~55-69°N)
-  // At northern latitudes, longitude degrees are visually shorter
-  const latitudeCompressionFactor = 0.55;
+  // Calculate proper latitude compression factor for Sweden's latitude range
+  // Use the central latitude for Mercator projection compensation
+  const centralLat = (bounds.maxLat + bounds.minLat) / 2;
+  const centralLatRad = (centralLat * Math.PI) / 180;
+  
+  // For Mercator projection, longitude compression = cos(central latitude)
+  // Sweden's central latitude is ~62°N, cos(62°) ≈ 0.469
+  const latitudeCompressionFactor = Math.cos(centralLatRad);
   const aspectRatio = latRange / (lngRange * latitudeCompressionFactor);
 
   const baseWidth = 1000;

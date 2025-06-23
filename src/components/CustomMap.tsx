@@ -60,16 +60,34 @@ const CustomMap: React.FC<CustomMapProps> = ({
   } = mapState;
 
   // Map calculations using custom hooks
-  const bounds = useMapBounds(provinces, swedenBorderData, selectedProvince, showOnlySelected);
+  const bounds = useMapBounds(
+    provinces,
+    swedenBorderData,
+    selectedProvince,
+    showOnlySelected
+  );
   const mapDimensions = useMapDimensions(bounds);
   const provincePaths = useProvincePaths(provinces, bounds, mapDimensions);
-  const swedenBorderPath = useSwedenBorderPath(swedenBorderData, bounds, mapDimensions);
-  const { meridians, parallels } = useGridLines(bounds, mapDimensions, gridInterval);
-
+  const swedenBorderPath = useSwedenBorderPath(
+    swedenBorderData,
+    bounds,
+    mapDimensions
+  );
+  const { meridians, parallels } = useGridLines(
+    bounds,
+    mapDimensions,
+    gridInterval
+  );
 
   // Create reset function
   const resetView = useCallback(
-    createResetViewFunction(provinces, swedenBorderData, initialZoom, resetState, setViewBox),
+    createResetViewFunction(
+      provinces,
+      swedenBorderData,
+      initialZoom,
+      resetState,
+      setViewBox
+    ),
     [provinces, initialZoom, resetState, setViewBox]
   );
 
@@ -94,7 +112,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
     showOnlySelected,
     resetView,
   });
-
 
   // Update viewBox when bounds change (when switching between views)
   useEffect(() => {
@@ -185,7 +202,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
           <title>Sweden Border</title>
         </path>
 
-
         {/* Province polygons (top layer) */}
         {(showOnlySelected && selectedProvince
           ? [selectedProvince]
@@ -216,7 +232,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
           );
         })}
       </svg>
-
 
       {/* Control panel */}
       <div className="custom-map__controls">
