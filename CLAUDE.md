@@ -8,6 +8,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Build the application for production
 - `npm test` - Run tests (currently placeholder)
 
+## Git Commands
+
+When making commits and pushing changes to the current branch, use these commands:
+
+- `git add .` - Stage all changes
+- `git status` - Check staged changes
+- `git commit -m "feat: add escape key listener for province exit"` - Create commit with descriptive message
+- `git push origin custom` - Push changes to the custom branch
+
+### Commit Message Conventions
+
+Use conventional commit format for consistency:
+- `feat:` - New features
+- `fix:` - Bug fixes  
+- `refactor:` - Code refactoring
+- `style:` - Styling changes
+- `chore:` - Maintenance tasks
+- `docs:` - Documentation updates
+
+Examples:
+- `git commit -m "feat: implement province click-to-zoom functionality"`
+- `git commit -m "fix: resolve zoom constraint issues"`
+- `git commit -m "refactor: remove cloud parallax system"`
+- `git commit -m "style: update province selection styling"`
+
 ## Architecture Overview
 
 This is a React TypeScript application that displays Swedish municipalities on an interactive custom map using SVG rendering and Mercator projection. The project uses a completely custom mapping solution without external mapping libraries, following modern React patterns and best practices.
