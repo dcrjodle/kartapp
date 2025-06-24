@@ -61,23 +61,28 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
           major: 15
         };
         
-        // Calculate scale factor based on viewBox size to handle different province zoom levels
-        // When a province is selected, viewBox becomes much smaller, so elements need to scale up
-        const baseViewBoxSize = Math.max(mapDimensions.width, mapDimensions.height);
-        const currentViewBoxSize = Math.max(viewBox.width, viewBox.height);
-        const viewBoxScale = baseViewBoxSize / currentViewBoxSize;
-        const scaleFactor = Math.max(viewBoxScale * 0.1, 1); // Scale relative to zoom level
+        // Use fixed sizes and CSS transforms to ensure consistent visual appearance
+        const radius = baseSizes[sizeCategory];
+        const fontSize = 14;
+        const textOffset = 20;
         
-        const adjustedRadius = baseSizes[sizeCategory] * scaleFactor;
-        const adjustedFontSize = 14 * scaleFactor;
-        const adjustedTextOffset = 20 * scaleFactor;
+        // Calculate transform scale to counteract SVG scaling
+        // This ensures consistent visual size regardless of province aspect ratio
+        const transformScale = selectedProvince ? zoom * 2 : 1;
         
         return (
-          <g key={city.id} className="city-marker-group">
+          <g 
+            key={city.id} 
+            className="city-marker-group"
+            style={{
+              transform: `scale(${transformScale})`,
+              transformOrigin: `${x}px ${y}px`
+            }}
+          >
             <circle
               cx={x}
               cy={y}
-              r={adjustedRadius}
+              r={radius}
               className={`city-marker city-marker--${sizeCategory}`}
               role="button"
               tabIndex={0}
@@ -90,11 +95,11 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
             {/* Custom tooltip */}
             <text
               x={x}
-              y={y - adjustedTextOffset}
+              y={y - textOffset}
               className="city-tooltip"
               textAnchor="middle"
               pointerEvents="none"
-              fontSize={adjustedFontSize}
+              fontSize={fontSize}
             >
               {city.name}
             </text>
