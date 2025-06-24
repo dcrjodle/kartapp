@@ -1,13 +1,18 @@
 /**
- * MapControls Component Styles
+ * Modern MapControls Component Styles
+ * Glassmorphism design with modern aesthetics
  */
 
 @use "sass:color";
 @use "../styles/colors" as *;
 
-// Mixins
-@mixin shadow-box {
-  box-shadow: 0 2px 5px $control-shadow;
+// Modern Mixins
+@mixin glassmorphism {
+  background: $glass-background;
+  backdrop-filter: $glass-backdrop;
+  -webkit-backdrop-filter: $glass-backdrop;
+  border: 1px solid $glass-border;
+  box-shadow: $glass-shadow;
 }
 
 @mixin button-reset {
@@ -16,48 +21,84 @@
   padding: 0;
   margin: 0;
   cursor: pointer;
+  outline: none;
 }
 
-// Map controls
+@mixin modern-button {
+  @include button-reset;
+  border-radius: $radius-lg;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform $transition-base;
+  }
+  
+  &:hover::before {
+    transform: translateX(100%);
+  }
+}
+
+// Map controls container
 .map-controls {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: $control-background;
-  padding: 16px;
-  border-radius: 8px;
-  @include shadow-box;
+  top: $space-6;
+  left: $space-6;
+  @include glassmorphism;
+  padding: $space-6;
+  border-radius: $radius-2xl;
   z-index: 10;
-  min-width: 280px;
-  max-width: 320px;
+  min-width: 320px;
+  max-width: 380px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 
   // Header section
   &__header {
-    margin-bottom: 16px;
-    border-bottom: 1px solid color.adjust($control-text, $alpha: -0.8);
-    padding-bottom: 8px;
+    margin-bottom: $space-5;
+    border-bottom: 1px solid rgba($text-primary, 0.1);
+    padding-bottom: $space-3;
   }
 
   // Title
   &__title {
-    font-size: 18px;
-    font-weight: bold;
-    color: $control-text;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
     margin: 0;
     text-align: center;
+    background: linear-gradient(135deg, $primary, $secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   // Section containers
   &__section {
-    margin-bottom: 16px;
+    margin-bottom: $space-5;
 
     &:last-child {
       margin-bottom: 0;
     }
 
     &--info {
-      border-bottom: 1px solid color.adjust($control-text, $alpha: -0.8);
-      padding-bottom: 12px;
+      background: rgba($bg-primary, 0.1);
+      padding: $space-4;
+      border-radius: $radius-xl;
+      border: 1px solid rgba($text-primary, 0.05);
+      margin-bottom: $space-5;
     }
 
     &--controls {
@@ -67,154 +108,273 @@
 
   // Section titles
   &__section-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: $control-text;
-    margin: 0 0 8px 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $text-secondary;
+    margin: 0 0 $space-3 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    
+    &::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: $primary;
+      border-radius: $radius-full;
+    }
   }
 
   // Control information display
   &__info {
-    font-size: 14px;
-    color: $control-text;
-    line-height: 1.4;
+    font-size: $font-size-sm;
+    color: $text-primary;
+    line-height: $line-height-relaxed;
 
     &-item {
-      margin-bottom: 4px;
-
+      margin-bottom: $space-2;
+      padding: $space-2 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba($text-primary, 0.05);
+      
       &:last-child {
         margin-bottom: 0;
+        border-bottom: none;
+      }
+      
+      strong {
+        color: $text-accent;
+        font-weight: $font-weight-medium;
       }
     }
   }
 
   // Zoom disabled indicator
   &__zoom-disabled {
-    color: #999;
+    color: $text-tertiary;
     font-style: italic;
-    font-size: 10px;
+    font-size: $font-size-xs;
+    background: rgba($warning, 0.1);
+    padding: $space-1 $space-2;
+    border-radius: $radius-sm;
+    margin-left: $space-2;
   }
 
   // Button container
   &__buttons {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: $space-3;
   }
 
   // Zoom buttons container
   &__zoom-buttons {
     display: flex;
-    gap: 2px;
-    margin-bottom: 4px;
+    gap: $space-2;
+    margin-bottom: $space-3;
   }
 
   // Zoom buttons
   &__zoom-button {
-    @include button-reset;
+    @include modern-button;
     flex: 1;
-    padding: 8px 10px;
-    font-size: 16px;
-    font-weight: 700;
-    background-color: $button-background;
-    color: $button-text;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 32px;
+    padding: $space-3 $space-4;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    background: linear-gradient(135deg, $button-primary-bg, color.adjust($button-primary-bg, $lightness: -5%));
+    color: $button-primary-text;
+    border-radius: $radius-xl;
+    min-height: 48px;
+    box-shadow: $shadow-md;
 
     svg {
-      stroke-width: 2;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
     }
 
     &:hover:not(:disabled) {
-      background-color: color.adjust($button-background, $lightness: -10%);
+      background: linear-gradient(135deg, $button-primary-hover, color.adjust($button-primary-hover, $lightness: -5%));
+      transform: translateY(-1px);
+      box-shadow: $shadow-lg;
     }
 
     &:active:not(:disabled) {
-      background-color: color.adjust($button-background, $lightness: -15%);
+      transform: translateY(0);
+      box-shadow: $shadow-sm;
     }
 
     &:focus {
-      outline: 2px solid color.adjust($button-background, $lightness: 20%);
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: $shadow-lg, 0 0 0 3px rgba($primary, 0.2);
     }
 
     &:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
+      transform: none;
+      background: $gray-300;
+      
+      &:hover {
+        transform: none;
+        box-shadow: $shadow-md;
+      }
     }
   }
 
   // Reset button
   &__reset-button {
-    @include button-reset;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: $button-background;
-    color: $button-text;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    min-height: 32px;
+    @include modern-button;
+    padding: $space-3 $space-4;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    background: linear-gradient(135deg, $button-secondary-bg, color.adjust($button-secondary-bg, $lightness: -5%));
+    color: $button-secondary-text;
+    border-radius: $radius-xl;
+    min-height: 44px;
+    box-shadow: $shadow-sm;
+    border: 1px solid rgba($text-primary, 0.1);
 
     &:hover {
-      background-color: color.adjust($button-background, $lightness: -10%);
+      background: linear-gradient(135deg, $button-secondary-hover, color.adjust($button-secondary-hover, $lightness: -5%));
+      transform: translateY(-1px);
+      box-shadow: $shadow-md;
+      border-color: rgba($text-primary, 0.15);
     }
 
     &:active {
-      background-color: color.adjust($button-background, $lightness: -15%);
+      transform: translateY(0);
+      box-shadow: $shadow-sm;
     }
 
     &:focus {
-      outline: 2px solid color.adjust($button-background, $lightness: 20%);
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: $shadow-md, 0 0 0 3px rgba($gray-400, 0.2);
     }
   }
 }
 
-// Responsive adjustments
+// Responsive Design - Mobile First
 @media (max-width: 768px) {
   .map-controls {
-    top: 5px;
-    left: 5px;
-    padding: 8px;
+    top: $space-4;
+    left: $space-4;
+    right: $space-4;
+    padding: $space-4;
+    min-width: auto;
+    max-width: none;
+
+    &__title {
+      font-size: $font-size-lg;
+    }
 
     &__info {
-      font-size: 11px;
+      font-size: $font-size-xs;
+      
+      &-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $space-1;
+      }
+    }
+
+    &__zoom-button {
+      min-height: 44px;
+      font-size: $font-size-base;
     }
 
     &__reset-button {
-      padding: 4px 8px;
-      font-size: 11px;
+      min-height: 40px;
+      font-size: $font-size-xs;
     }
   }
 }
 
 @media (max-width: 480px) {
   .map-controls {
-    padding: 6px;
+    padding: $space-3;
+    border-radius: $radius-xl;
 
-    &__info {
-      font-size: 10px;
+    &__header {
+      margin-bottom: $space-3;
     }
 
-    &__reset-button {
-      padding: 3px 6px;
-      font-size: 10px;
+    &__section {
+      margin-bottom: $space-3;
+      
+      &--info {
+        padding: $space-3;
+      }
+    }
+
+    &__zoom-buttons {
+      flex-direction: column;
+      gap: $space-2;
+    }
+
+    &__zoom-button {
+      min-height: 40px;
     }
   }
 }
 
-// Reduced motion support
+// Accessibility & Reduced Motion
 @media (prefers-reduced-motion: reduce) {
   .map-controls {
+    &__zoom-button,
     &__reset-button {
       transition: none;
+      
+      &:hover {
+        transform: none;
+      }
+      
+      &::before {
+        display: none;
+      }
+    }
+  }
+}
+
+// High Contrast Mode Support
+@media (prefers-contrast: high) {
+  .map-controls {
+    border: 2px solid $text-primary;
+    background: $bg-primary;
+    
+    &__zoom-button,
+    &__reset-button {
+      border: 2px solid $text-primary;
+      background: $bg-primary;
+      color: $text-primary;
+      
+      &:hover {
+        background: $text-primary;
+        color: $bg-primary;
+      }
+    }
+  }
+}
+
+// Dark Mode Preparation
+@media (prefers-color-scheme: dark) {
+  .map-controls {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+    
+    &__title {
+      color: $white;
+    }
+    
+    &__info {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    &__section-title {
+      color: rgba(255, 255, 255, 0.7);
     }
   }
 }
