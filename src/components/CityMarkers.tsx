@@ -68,7 +68,8 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
         
         // Calculate transform scale to counteract SVG scaling
         // This ensures consistent visual size regardless of province aspect ratio
-        const transformScale = selectedProvince ? zoom * 2 : 1;
+        const baseScale = selectedProvince ? zoom * 2 : 1;
+        const transformScale = Math.min(baseScale, 3); // Cap maximum scale at 3x
         
         return (
           <g 
