@@ -98,8 +98,8 @@ describe('City Markers', () => {
   });
 
   it('should display correct number of cities per province', () => {
-    // Test major provinces that should have cities
-    const majorProvinces = ['Stockholm', 'Göteborg', 'Malmö'];
+    // Test major provinces that should have cities (using actual province names)
+    const majorProvinces = ['stockholm', 'västra-götaland', 'skåne'];
     
     majorProvinces.forEach((province) => {
       cy.get(`[data-testid="province-${province}"]`).then(($province) => {

@@ -20,11 +20,10 @@ describe('Province Interactions', () => {
 
   it('should select province on click and show selection state', () => {
     cy.get('path[data-testid^="province-"]').first().then(($province) => {
-      const provinceId = $province.attr('data-testid');
       cy.wrap($province).click();
       
       // Check if province has selected state (different styling)
-      cy.wrap($province).should('have.attr', 'data-selected', 'true').or('have.class', 'selected');
+      cy.wrap($province).should('have.attr', 'data-selected', 'true');
       
       // Check if province info is displayed
       cy.get('[data-testid="province-info"]').should('be.visible');
