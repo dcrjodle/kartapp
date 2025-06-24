@@ -13,6 +13,8 @@ export interface Translations {
     selected: string;
     zoom: string;
     zoomDisabled: string;
+    zoomIn: string;
+    zoomOut: string;
     bounds: string;
     viewBox: string;
     showAll: string;
@@ -43,6 +45,8 @@ export const translations: Record<SupportedLanguage, Translations> = {
       selected: 'Selected',
       zoom: 'Zoom',
       zoomDisabled: '(disabled)',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
       bounds: 'Bounds',
       viewBox: 'ViewBox',
       showAll: 'Show All',
@@ -91,6 +95,8 @@ export const translations: Record<SupportedLanguage, Translations> = {
       selected: 'Valt',
       zoom: 'Zoom',
       zoomDisabled: '(inaktiverad)',
+      zoomIn: 'Zooma in',
+      zoomOut: 'Zooma ut',
       bounds: 'Gränser',
       viewBox: 'Vy',
       showAll: 'Visa alla',

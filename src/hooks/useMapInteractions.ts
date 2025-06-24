@@ -149,6 +149,64 @@ export const useMapInteractions = ({
     // The bounds and viewBox will automatically update due to the useMemo dependencies
   }, [hasDragged, initialZoom, setSelectedProvince, setShowOnlySelected, setZoom]);
 
+  /**
+   * Handle zoom in button click
+   */
+  const handleZoomIn = useCallback(() => {
+    // Disable zoom when showing only selected province
+    if (showOnlySelected && selectedProvince) {
+      return;
+    }
+
+    const zoomFactor = 1.2; // 20% zoom in
+    const newZoom = constrainZoom(zoom * zoomFactor, minZoom, maxZoom);
+    
+    if (newZoom !== zoom) {
+      setZoom(newZoom);
+      setViewBox((prev) => {
+        // Zoom towards center of viewport
+        const rect = svgRef.current?.getBoundingClientRect();
+        if (rect) {
+          const centerPosition: MousePosition = { 
+            x: rect.left + rect.width / 2, 
+            y: rect.top + rect.height / 2 
+          };
+          return calculateZoomedViewBox(prev, zoomFactor, centerPosition, rect);
+        }
+        return prev;
+      });
+    }
+  }, [zoom, minZoom, maxZoom, showOnlySelected, selectedProvince, setZoom, setViewBox]);
+
+  /**
+   * Handle zoom out button click
+   */
+  const handleZoomOut = useCallback(() => {
+    // Disable zoom when showing only selected province
+    if (showOnlySelected && selectedProvince) {
+      return;
+    }
+
+    const zoomFactor = 1 / 1.2; // 20% zoom out
+    const newZoom = constrainZoom(zoom * zoomFactor, minZoom, maxZoom);
+    
+    if (newZoom !== zoom) {
+      setZoom(newZoom);
+      setViewBox((prev) => {
+        // Zoom towards center of viewport
+        const rect = svgRef.current?.getBoundingClientRect();
+        if (rect) {
+          const centerPosition: MousePosition = { 
+            x: rect.left + rect.width / 2, 
+            y: rect.top + rect.height / 2 
+          };
+          return calculateZoomedViewBox(prev, zoomFactor, centerPosition, rect);
+        }
+        return prev;
+      });
+    }
+  }, [zoom, minZoom, maxZoom, showOnlySelected, selectedProvince, setZoom, setViewBox]);
+
   return {
     svgRef,
     handleMouseDown,
@@ -156,5 +214,7 @@ export const useMapInteractions = ({
     handleMouseUp,
     handleWheel,
     handleProvinceClick,
+    handleZoomIn,
+    handleZoomOut,
   };
 };

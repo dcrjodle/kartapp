@@ -18,6 +18,8 @@ interface MapControlsProps {
   bounds: Bounds;
   viewBox: ViewBox;
   onResetView: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
@@ -28,11 +30,13 @@ const MapControls: React.FC<MapControlsProps> = ({
   bounds,
   viewBox,
   onResetView,
+  onZoomIn,
+  onZoomOut,
 }) => {
   const { t } = useTranslations();
   
   return (
-    <div className="map-controls" role="region" aria-label={t('map.title')}>
+    <div className="map-controls" role="region" aria-label={t('map.title')} data-testid="map-controls">
       <div className="map-controls__info">
         <div className="map-controls__info-item">
           {t('map.zoom')}: {zoom.toFixed(2)}
@@ -41,7 +45,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           )}
         </div>
         {selectedProvince && showOnlySelected ? (
-          <div className="map-controls__info-item">
+          <div className="map-controls__info-item" data-testid="province-info">
             {t('map.selected')}: {selectedProvince.name}
           </div>
         ) : (
@@ -56,12 +60,41 @@ const MapControls: React.FC<MapControlsProps> = ({
         <div className="map-controls__info-item">
           {t('map.viewBox')}: ({viewBox.x.toFixed(0)}, {viewBox.y.toFixed(0)})
         </div>
+        {/* Placeholder for city info */}
+        <div className="map-controls__info-item" data-testid="city-info" style={{ display: 'none' }}>
+          City information placeholder
+        </div>
       </div>
       <div className="map-controls__buttons">
+        {onZoomIn && (
+          <button
+            onClick={onZoomIn}
+            className="map-controls__zoom-button"
+            type="button"
+            data-testid="zoom-in"
+            aria-label={t('map.zoomIn')}
+            disabled={showOnlySelected && selectedProvince}
+          >
+            +
+          </button>
+        )}
+        {onZoomOut && (
+          <button
+            onClick={onZoomOut}
+            className="map-controls__zoom-button"
+            type="button"
+            data-testid="zoom-out"
+            aria-label={t('map.zoomOut')}
+            disabled={showOnlySelected && selectedProvince}
+          >
+            -
+          </button>
+        )}
         <button
           onClick={onResetView}
           className="map-controls__reset-button"
           type="button"
+          data-testid="reset-view"
           aria-label={
             selectedProvince && showOnlySelected
               ? t('map.showAllProvinces')

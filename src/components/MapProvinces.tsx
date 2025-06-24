@@ -52,6 +52,8 @@ const MapProvinces: React.FC<MapProvincesProps> = ({
               name: province.name || '',
               selectedState: selectedProvince?.id === province.id ? t('accessibility.provinceSelected') : ''
             })}
+            data-testid={`province-${province.name?.toLowerCase().replace(/\s+/g, '-')}`}
+            data-selected={selectedProvince?.id === province.id}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();

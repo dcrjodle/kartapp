@@ -107,6 +107,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
     handleMouseUp,
     handleWheel,
     handleProvinceClick,
+    handleZoomIn,
+    handleZoomOut,
   } = useMapInteractions({
     ...mapState,
     minZoom,
@@ -160,7 +162,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
   }`;
 
   return (
-    <div className="custom-map" role="application" aria-label={t('map.title')}>
+    <div className="custom-map" role="application" aria-label={t('map.title')} data-testid="custom-map">
       {/* Main SVG map element */}
       <svg
         ref={svgRef}
@@ -217,6 +219,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
         bounds={bounds}
         viewBox={viewBox}
         onResetView={resetView}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
       />
     </div>
   );

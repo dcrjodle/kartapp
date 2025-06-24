@@ -32,6 +32,7 @@ const MovingClouds: React.FC<MovingCloudsProps> = ({ zoom, selectedProvince }) =
   return (
     <div 
       className="clouds-container"
+      data-testid="clouds"
       style={{
         transform: `scale(${finalScale})`,
         opacity: cloudOpacity,

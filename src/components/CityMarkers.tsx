@@ -95,6 +95,14 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
                 population: city.population.toLocaleString()
               })}
               data-city-name={city.name}
+              data-testid={`city-${city.name.toLowerCase().replace(/\s+/g, '-')}`}
+              onClick={() => console.log('City clicked:', city.name)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  console.log('City selected:', city.name);
+                }
+              }}
             >
               {/* Tooltip title for hover */}
               <title>{city.name}</title>
