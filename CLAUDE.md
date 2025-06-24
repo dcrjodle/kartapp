@@ -94,6 +94,20 @@ src/
 - **Well documented** - Include JSDoc comments for complex calculations
 - **Testable** - Structure utilities to be easily unit tested
 
+### Styling Guidelines
+
+- **Centralized colors** - All color variables must be defined in `src/styles/_colors.scss`
+- **Import color variables** - Use `@use "../styles/colors" as *;` in component SCSS files
+- **No hardcoded colors** - Never use color values directly in component styles
+
+### Internationalization Guidelines
+
+- **Translation hook** - Use `useTranslations()` hook in components for text content
+- **Dictionary structure** - All text content must be in `src/utils/i18n.ts` 
+- **Language detection** - Regional language is automatically detected from browser
+- **Fallback language** - English is always the fallback language
+- **Template strings** - Use `t('key', variables)` for dynamic content with placeholders
+
 ### Data Folder Guidelines
 
 - **Data only** - The `src/data/` folder should only contain data files and type definitions

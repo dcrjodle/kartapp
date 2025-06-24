@@ -1,0 +1,49 @@
+/**
+ * Color Variables
+ * Central color definitions for the entire application
+ */
+
+// Map background and grid colors
+$map-background: linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 50%, #e8f4fd 100%);
+$grid-color: #e0e0e0;
+$grid-line-color: #ccc;
+
+// Province and region colors
+$province-fill: #4a90e2;
+$province-stroke: #2c5aa0;
+$province-selected-stroke: #e67e22;
+$province-focus-stroke: #007acc;
+
+// County colors (legacy)
+$county-fill: #4a90e2;
+$county-stroke: #2c5aa0;
+$detailed-county-fill: #e74c3c;
+$detailed-county-stroke: #c0392b;
+
+// Sweden border color
+$sweden-border-color: #2c3e50;
+
+// City marker colors
+$city-color-major: #ff4444;
+$city-color-large: #ff8844;
+$city-color-medium: #ffaa44;
+$city-color-small: #ffcc44;
+
+// City label colors
+$city-label-color: #333;
+$city-label-background: rgba(255, 255, 255, 0.9);
+
+// Control panel colors
+$control-background: white;
+$control-shadow: rgba(0, 0, 0, 0.2);
+$control-text: #666;
+$control-zoom-disabled: #999;
+
+// Button colors
+$button-background: #4a90e2;
+$button-text: white;
+
+// General UI colors
+$white: #ffffff;
+$black: #000000;
+$transparent: transparent;

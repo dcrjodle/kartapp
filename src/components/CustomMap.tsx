@@ -12,6 +12,7 @@ import { type Provinces } from "../utils/mapProjection";
 import { useMapState } from "../hooks/useMapState";
 import { useMapInteractions } from "../hooks/useMapInteractions";
 import { useMapKeyboard } from "../hooks/useMapKeyboard";
+import { useTranslations } from "../hooks/useTranslations";
 import {
   useMapBounds,
   useMapDimensions,
@@ -58,6 +59,9 @@ const CustomMap: React.FC<CustomMapProps> = ({
   onZoomChange,
   onProvinceChange,
 }) => {
+  // Translation hook
+  const { t } = useTranslations();
+  
   // Custom hooks for state management
   const mapState = useMapState(initialZoom);
   const {
@@ -156,7 +160,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
   }`;
 
   return (
-    <div className="custom-map" role="application" aria-label="Interactive map of Swedish provinces">
+    <div className="custom-map" role="application" aria-label={t('map.title')}>
       {/* Main SVG map element */}
       <svg
         ref={svgRef}
@@ -167,7 +171,10 @@ const CustomMap: React.FC<CustomMapProps> = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         role="img"
-        aria-label={`Map of Sweden showing ${provinces.length} provinces${selectedProvince ? `, with ${selectedProvince.name} selected` : ''}`}
+        aria-label={t('accessibility.mapDescription', { 
+          count: provinces.length.toString(), 
+          selected: selectedProvince ? t('accessibility.provinceSelected') : ''
+        })}
         tabIndex={0}
         aria-describedby="map-instructions"
       >
@@ -198,8 +205,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
 
       {/* Hidden instructions for screen readers */}
       <div id="map-instructions" className="sr-only">
-        Interactive map of Swedish provinces. Use mouse to pan and zoom, or click provinces to select them. 
-        Use Tab to navigate between provinces, Enter or Space to select. Press Escape to reset view.
+        {t('map.instructions')}
       </div>
 
       {/* Control panel */}

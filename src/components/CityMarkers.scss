@@ -2,14 +2,7 @@
  * CityMarkers Component Styles
  */
 
-// Variables
-$city-color-major: #ff4444;
-$city-color-large: #ff8844;
-$city-color-medium: #ffaa44;
-$city-color-small: #ffcc44;
-
-$city-label-color: #333;
-$city-label-background: rgba(255, 255, 255, 0.9);
+@use "../styles/colors" as *;
 
 // City marker styles
 .city-marker {

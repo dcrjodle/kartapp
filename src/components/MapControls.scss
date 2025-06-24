@@ -3,13 +3,7 @@
  */
 
 @use "sass:color";
-
-// Variables
-$control-background: white;
-$control-shadow: rgba(0, 0, 0, 0.2);
-$control-text: #666;
-$button-background: #4a90e2;
-$button-text: white;
+@use "../styles/colors" as *;
 
 // Mixins
 @mixin shadow-box {

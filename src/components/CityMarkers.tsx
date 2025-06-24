@@ -8,6 +8,7 @@ import React from 'react';
 import { projectToSVG, type Bounds, type MapDimensions } from '../utils/mapProjection';
 import { SwedishCity, getCitySizeCategory } from '../utils/cityDataProcessing';
 import { type ViewBox } from '../utils/mapInteractions';
+import { useTranslations } from '../hooks/useTranslations';
 import './CityMarkers.scss';
 
 interface CityMarkersProps {
@@ -29,6 +30,8 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
   showCities = true,
   viewBox,
 }) => {
+  const { t } = useTranslations();
+  
   if (!showCities) return null;
 
   // Only show cities when a province is selected
@@ -48,7 +51,7 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
   const visibleCities = getVisibleCities();
 
   return (
-    <g role="group" aria-label="Swedish cities">
+    <g role="group" aria-label={t('cities.population')}>
       {visibleCities.map((city) => {
         const [x, y] = projectToSVG(city.lng, city.lat, bounds, mapDimensions);
         const sizeCategory = getCitySizeCategory(city.population);
@@ -87,7 +90,10 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
               className={`city-marker city-marker--${sizeCategory}`}
               role="button"
               tabIndex={0}
-              aria-label={`${city.name}, population ${city.population.toLocaleString()}`}
+              aria-label={t('accessibility.cityMarker', {
+                name: city.name,
+                population: city.population.toLocaleString()
+              })}
               data-city-name={city.name}
             >
               {/* Tooltip title for hover */}

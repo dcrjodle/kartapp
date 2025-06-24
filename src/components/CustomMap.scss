@@ -4,26 +4,7 @@
  */
 
 @use "sass:color";
-
-// Variables
-$map-background: linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 50%, #e8f4fd 100%);
-$grid-color: #e0e0e0;
-$grid-line-color: #ccc;
-
-// Data type colors
-$county-fill: #4a90e2;
-$county-stroke: #2c5aa0;
-$detailed-county-fill: #e74c3c;
-$detailed-county-stroke: #c0392b;
-$province-fill: #4a90e2;
-$province-stroke: #2c5aa0;
-$sweden-border-color: #2c3e50;
-
-$control-background: white;
-$control-shadow: rgba(0, 0, 0, 0.2);
-$control-text: #666;
-$button-background: #4a90e2;
-$button-text: white;
+@use "../styles/colors" as *;
 
 // Mixins
 @mixin flex-center {
@@ -142,14 +123,14 @@ $button-text: white;
     }
 
     &:focus {
-      stroke: #007acc;
+      stroke: $province-focus-stroke;
       stroke-width: 3;
     }
 
     &--selected {
       fill-opacity: 0.9;
       stroke-width: 2;
-      stroke: #e67e22;
+      stroke: $province-selected-stroke;
       
       &:hover {
         fill-opacity: 1;

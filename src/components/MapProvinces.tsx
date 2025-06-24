@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { type Provinces } from '../utils/mapProjection';
+import { useTranslations } from '../hooks/useTranslations';
 
 interface MapProvincesProps {
   provinces: Provinces[];
@@ -22,12 +23,13 @@ const MapProvinces: React.FC<MapProvincesProps> = ({
   showOnlySelected,
   onProvinceClick,
 }) => {
+  const { t } = useTranslations();
   const displayProvinces = showOnlySelected && selectedProvince
     ? [selectedProvince]
     : provinces;
 
   return (
-    <g role="group" aria-label="Swedish provinces">
+    <g role="group" aria-label={t('map.provinces')}>
       {displayProvinces.map((province, displayIndex) => {
         const originalIndex = showOnlySelected && selectedProvince
           ? provinces.findIndex((p) => p.id === province.id)
@@ -46,9 +48,10 @@ const MapProvinces: React.FC<MapProvincesProps> = ({
             onClick={() => onProvinceClick(province, originalIndex)}
             role="button"
             tabIndex={0}
-            aria-label={`Province: ${province.name}${
-              selectedProvince?.id === province.id ? ' (selected)' : ''
-            }`}
+            aria-label={t('accessibility.provinceButton', {
+              name: province.name || '',
+              selectedState: selectedProvince?.id === province.id ? t('accessibility.provinceSelected') : ''
+            })}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();

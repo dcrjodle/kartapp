@@ -7,6 +7,7 @@
 import React from 'react';
 import { type Provinces, type Bounds } from '../utils/mapProjection';
 import { type ViewBox } from '../utils/mapInteractions';
+import { useTranslations } from '../hooks/useTranslations';
 import './MapControls.scss';
 
 interface MapControlsProps {
@@ -28,30 +29,32 @@ const MapControls: React.FC<MapControlsProps> = ({
   viewBox,
   onResetView,
 }) => {
+  const { t } = useTranslations();
+  
   return (
-    <div className="map-controls" role="region" aria-label="Map controls and information">
+    <div className="map-controls" role="region" aria-label={t('map.title')}>
       <div className="map-controls__info">
         <div className="map-controls__info-item">
-          Zoom: {zoom.toFixed(2)}
+          {t('map.zoom')}: {zoom.toFixed(2)}
           {showOnlySelected && selectedProvince && (
-            <span className="map-controls__zoom-disabled"> (disabled)</span>
+            <span className="map-controls__zoom-disabled"> {t('map.zoomDisabled')}</span>
           )}
         </div>
         {selectedProvince && showOnlySelected ? (
           <div className="map-controls__info-item">
-            Selected: {selectedProvince.name}
+            {t('map.selected')}: {selectedProvince.name}
           </div>
         ) : (
           <div className="map-controls__info-item">
-            Provinces: {provinces.length}
+            {t('map.provinces')}: {provinces.length}
           </div>
         )}
         <div className="map-controls__info-item">
-          Bounds: {bounds.minLat.toFixed(1)}°-{bounds.maxLat.toFixed(1)}°N,{" "}
+          {t('map.bounds')}: {bounds.minLat.toFixed(1)}°-{bounds.maxLat.toFixed(1)}°N,{" "}
           {bounds.minLng.toFixed(1)}°-{bounds.maxLng.toFixed(1)}°E
         </div>
         <div className="map-controls__info-item">
-          ViewBox: ({viewBox.x.toFixed(0)}, {viewBox.y.toFixed(0)})
+          {t('map.viewBox')}: ({viewBox.x.toFixed(0)}, {viewBox.y.toFixed(0)})
         </div>
       </div>
       <div className="map-controls__buttons">
@@ -61,11 +64,11 @@ const MapControls: React.FC<MapControlsProps> = ({
           type="button"
           aria-label={
             selectedProvince && showOnlySelected
-              ? "Show all provinces"
-              : "Reset map view to initial position"
+              ? t('map.showAllProvinces')
+              : t('map.resetMapView')
           }
         >
-          {selectedProvince && showOnlySelected ? "Show All" : "Reset View"}
+          {selectedProvince && showOnlySelected ? t('map.showAll') : t('map.resetView')}
         </button>
       </div>
     </div>
