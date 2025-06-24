@@ -121,18 +121,18 @@
 // Animation keyframes
 @keyframes moveCloudRight {
   0% {
-    transform: translateX(-100px);
+    transform: translateX(-600px); // Start far enough left to account for shadow offset
   }
   100% {
-    transform: translateX(calc(100vw + 200px));
+    transform: translateX(calc(100vw + 100px)); // End far enough right
   }
 }
 
 @keyframes moveCloudLeft {
   0% {
-    transform: translateX(100px);
+    transform: translateX(calc(100vw + 600px)); // Start far enough right to account for shadow offset
   }
   100% {
-    transform: translateX(calc(-100vw - 200px));
+    transform: translateX(-100px); // End far enough left
   }
 }

@@ -20,6 +20,9 @@ Use conventional commit format:
 - `refactor:` - Code refactoring
 - `style:` - Styling changes
 
+### Git Best Practices
+- Always commit when making changes, and only push when a conversation is done
+
 ## Project Overview
 
 React TypeScript application displaying Swedish municipalities on an interactive SVG map using custom Mercator projection. No external mapping libraries used.
