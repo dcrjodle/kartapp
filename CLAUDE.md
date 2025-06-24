@@ -49,11 +49,17 @@ src/
 ├── hooks/                      # Custom React hooks
 │   ├── useMapState.ts         # State management
 │   ├── useMapInteractions.ts  # Mouse/wheel events
-│   └── useMapKeyboard.ts      # Keyboard events
+│   ├── useMapKeyboard.ts      # Keyboard events
+│   └── useTranslations.ts     # Internationalization
 ├── utils/
 │   ├── mapProjection.ts       # Geographic calculations
 │   ├── mapInteractions.ts     # Interaction utilities
-│   └── mapCalculations.ts     # Calculation hooks
+│   ├── mapCalculations.ts     # Calculation hooks
+│   └── i18n.ts               # Translation utilities
+├── content/
+│   └── translations.ts       # All text content
+├── styles/
+│   └── _colors.scss          # Color variables
 └── data/sweden.ts             # GeoJSON data
 ```
 
@@ -100,10 +106,18 @@ src/
 - **Import color variables** - Use `@use "../styles/colors" as *;` in component SCSS files
 - **No hardcoded colors** - Never use color values directly in component styles
 
+### Content Management Guidelines
+
+- **Content folder** - All text content must be stored in `src/content/` folder
+- **Translation files** - Text content goes in `src/content/translations.ts`
+- **Utility separation** - Content retrieval utilities go in `src/utils/` folder
+- **Hook access** - Components access content through hooks in `src/hooks/`
+
 ### Internationalization Guidelines
 
 - **Translation hook** - Use `useTranslations()` hook in components for text content
-- **Dictionary structure** - All text content must be in `src/utils/i18n.ts` 
+- **Content structure** - All text content must be in `src/content/translations.ts` 
+- **Utility functions** - Translation utilities in `src/utils/i18n.ts`
 - **Language detection** - Regional language is automatically detected from browser
 - **Fallback language** - English is always the fallback language
 - **Template strings** - Use `t('key', variables)` for dynamic content with placeholders

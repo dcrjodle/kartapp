@@ -3,12 +3,11 @@
  */
 
 import { useState, useEffect } from 'react';
+import { type SupportedLanguage, type Translations } from '../content/translations';
 import { 
   getBrowserLanguage, 
   getTranslations, 
-  templateString, 
-  type SupportedLanguage, 
-  type Translations 
+  templateString
 } from '../utils/i18n';
 
 export const useTranslations = () => {
