@@ -28,22 +28,22 @@ $city-label-background: rgba(255, 255, 255, 0.9);
   
   // Size variations based on population
   &--small {
-    r: 6;
+    r: 8;
     fill: $city-color-small;
   }
   
   &--medium {
-    r: 8;
+    r: 10;
     fill: $city-color-medium;
   }
   
   &--large {
-    r: 10;
+    r: 12;
     fill: $city-color-large;
   }
   
   &--major {
-    r: 12;
+    r: 15;
     fill: $city-color-major;
   }
 }
@@ -51,11 +51,11 @@ $city-label-background: rgba(255, 255, 255, 0.9);
 // City marker group and tooltip
 .city-marker-group {
   .city-tooltip {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     fill: $city-label-color;
     stroke: $city-label-background;
-    stroke-width: 3;
+    stroke-width: 4;
     paint-order: stroke fill;
     opacity: 0;
     transition: opacity 0.1s ease;
@@ -70,14 +70,14 @@ $city-label-background: rgba(255, 255, 255, 0.9);
 // Responsive adjustments
 @media (max-width: 768px) {
   .city-marker {
-    &--small { r: 4; }
-    &--medium { r: 5; }
-    &--large { r: 6; }
-    &--major { r: 7; }
+    &--small { r: 6; }
+    &--medium { r: 7; }
+    &--large { r: 8; }
+    &--major { r: 10; }
   }
   
   .city-marker-group .city-tooltip {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
