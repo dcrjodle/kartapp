@@ -16,8 +16,11 @@ const MovingClouds: React.FC<MovingCloudsProps> = ({ zoom, selectedProvince }) =
   const clouds = Array.from({ length: cloudCount }, (_, i) => i + 1);
   
   // Calculate cloud effects based on zoom level
-  const cloudScale = Math.min(1 + (zoom - 1) * 2, 3); // Scale up to 3x at zoom level 2
-  const cloudOpacity = Math.max(1 - (zoom - 1) * 1.5, 0); // Fade out as zoom increases
+  // When zoom decreases (zooming in), clouds should get bigger and fade out
+  // When zoom increases (zooming out), clouds should get smaller and more visible
+  const zoomIn = Math.max(1 - zoom, 0); // How much we're zoomed in (0 = normal, positive = zoomed in)
+  const cloudScale = Math.min(1 + zoomIn * 4, 3); // Scale up when zooming in
+  const cloudOpacity = Math.max(1 - zoomIn * 2, 0); // Fade out when zooming in
   
   // Apply province-specific scaling
   const finalScale = cloudScale * provinceSizeMultiplier;
