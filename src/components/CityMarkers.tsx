@@ -28,21 +28,18 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
 }) => {
   if (!showCities) return null;
 
-  // Filter cities based on zoom level and province selection
+  // Only show cities when a province is selected
   const getVisibleCities = () => {
-    let filteredCities = cities;
-
-    // Filter by province if one is selected
-    if (selectedProvince) {
-      filteredCities = cities.filter(city => 
-        city.admin_name.toLowerCase().includes(selectedProvince.name.toLowerCase()) ||
-        city.name.toLowerCase().includes(selectedProvince.name.toLowerCase())
-      );
+    if (!selectedProvince) {
+      return []; // No cities shown when no province is selected
     }
 
-    // Filter by zoom level (show fewer cities when zoomed out)
-    const minPopulation = zoom > 1.5 ? 10000 : zoom > 1 ? 50000 : 100000;
-    return filteredCities.filter(city => city.population >= minPopulation);
+    // Filter by province selection and minimum population
+    return cities.filter(city => 
+      city.population >= 300000 && // Only cities with 300k+ population
+      (city.admin_name.toLowerCase().includes(selectedProvince.name.toLowerCase()) ||
+       city.name.toLowerCase().includes(selectedProvince.name.toLowerCase()))
+    );
   };
 
   const visibleCities = getVisibleCities();
@@ -54,35 +51,18 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
         const sizeCategory = getCitySizeCategory(city.population);
         
         return (
-          <g key={city.id} className={`city-marker city-marker--${sizeCategory}`}>
-            {/* City marker circle */}
-            <circle
-              cx={x}
-              cy={y}
-              className="city-marker__circle"
-              role="button"
-              tabIndex={0}
-              aria-label={`${city.name}, population ${city.population.toLocaleString()}`}
-            />
-            
-            {/* City label */}
-            <text
-              x={x}
-              y={y - 8}
-              className="city-marker__label"
-              textAnchor="middle"
-              aria-hidden="true"
-            >
-              {city.name}
-            </text>
-            
-            {/* Tooltip title */}
-            <title>
-              {city.name}
-              {city.admin_name && ` (${city.admin_name})`}
-              {'\n'}Population: {city.population.toLocaleString()}
-            </title>
-          </g>
+          <circle
+            key={city.id}
+            cx={x}
+            cy={y}
+            className={`city-marker city-marker--${sizeCategory}`}
+            role="button"
+            tabIndex={0}
+            aria-label={`${city.name}, population ${city.population.toLocaleString()}`}
+          >
+            {/* Tooltip title for hover */}
+            <title>{city.name}</title>
+          </circle>
         );
       })}
     </g>
