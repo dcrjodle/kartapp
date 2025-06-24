@@ -85,12 +85,12 @@ export const useMapInteractions = ({
     }
 
     setViewBox((prev) => {
-      const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY);
+      const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoom);
       return newViewBox;
     });
     
     setLastMousePos({ x: e.clientX, y: e.clientY });
-  }, [isDragging, lastMousePos, setHasDragged, setViewBox, setLastMousePos]);
+  }, [isDragging, lastMousePos, zoom, setHasDragged, setViewBox, setLastMousePos]);
 
   /**
    * Handle mouse up event to stop dragging
