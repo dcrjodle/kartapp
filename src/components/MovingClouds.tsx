@@ -7,18 +7,26 @@ interface MovingCloudsProps {
 }
 
 const MovingClouds: React.FC<MovingCloudsProps> = ({ zoom, selectedProvince }) => {
-  // Generate multiple clouds with different properties
-  const clouds = Array.from({ length: 8 }, (_, i) => i + 1);
+  // Adjust cloud count and size based on province selection
+  const isProvinceSelected = selectedProvince !== null;
+  const cloudCount = isProvinceSelected ? 4 : 8; // Fewer clouds when province selected
+  const provinceSizeMultiplier = isProvinceSelected ? 1.3 : 1; // Larger clouds when province selected
+  
+  // Generate clouds based on current count
+  const clouds = Array.from({ length: cloudCount }, (_, i) => i + 1);
   
   // Calculate cloud effects based on zoom level
   const cloudScale = Math.min(1 + (zoom - 1) * 2, 3); // Scale up to 3x at zoom level 2
   const cloudOpacity = Math.max(1 - (zoom - 1) * 1.5, 0); // Fade out as zoom increases
   
+  // Apply province-specific scaling
+  const finalScale = cloudScale * provinceSizeMultiplier;
+  
   return (
     <div 
       className="clouds-container"
       style={{
-        transform: `scale(${cloudScale})`,
+        transform: `scale(${finalScale})`,
         opacity: cloudOpacity,
         transition: 'transform 0.5s ease-out, opacity 0.5s ease-out'
       }}
