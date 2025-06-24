@@ -118,6 +118,54 @@
   animation-delay: -45s;
 }
 
+.cloud-9 {
+  width: 340px;
+  height: 185px;
+  top: -390px;
+  left: -440px;
+  box-shadow: 
+    420px 350px 52px 0px rgba(255, 255, 255, 0.65), // Main cloud
+    445px 405px 28px 4px rgba(0, 0, 0, 0.025); // Ground shadow
+  animation: moveCloudRight 190s linear infinite;
+  animation-delay: -200s;
+}
+
+.cloud-10 {
+  width: 290px;
+  height: 160px;
+  top: -340px;
+  right: -380px;
+  box-shadow: 
+    340px 900px 42px 0px rgba(255, 255, 255, 0.55), // Main cloud
+    360px 950px 24px 3px rgba(0, 0, 0, 0.02); // Ground shadow
+  animation: moveCloudLeft 210s linear infinite;
+  animation-delay: -110s;
+}
+
+.cloud-11 {
+  width: 370px;
+  height: 205px;
+  top: -420px;
+  left: -480px;
+  box-shadow: 
+    460px 1000px 58px 0px rgba(255, 255, 255, 0.75), // Main cloud
+    485px 1060px 32px 5px rgba(0, 0, 0, 0.025); // Ground shadow
+  animation: moveCloudRight 260s linear infinite;
+  animation-delay: -80s;
+}
+
+.cloud-12 {
+  width: 310px;
+  height: 170px;
+  top: -360px;
+  right: -410px;
+  box-shadow: 
+    360px 620px 46px 0px rgba(255, 255, 255, 0.6), // Main cloud
+    380px 670px 26px 4px rgba(0, 0, 0, 0.025); // Ground shadow
+  animation: moveCloudLeft 230s linear infinite;
+  animation-delay: -160s;
+}
+
 // Animation keyframes
 @keyframes moveCloudRight {
   0% {

@@ -11,23 +11,24 @@ This file provides guidance to Claude Code when working with this repository.
 ## Git Workflow
 
 ### Branch: custom (current working branch)
+
 ### Main branch: main
 
 ### Commit Convention
+
 Use conventional commit format:
+
 - `feat:` - New features
-- `fix:` - Bug fixes  
+- `fix:` - Bug fixes
 - `refactor:` - Code refactoring
 - `style:` - Styling changes
-
-### Git Best Practices
-- Always commit when making changes, and only push when a conversation is done
 
 ## Project Overview
 
 React TypeScript application displaying Swedish municipalities on an interactive SVG map using custom Mercator projection. No external mapping libraries used.
 
 ### Technology Stack
+
 - React 19 + TypeScript
 - Webpack 5 + SASS
 - Custom SVG rendering
@@ -50,6 +51,7 @@ src/
 ```
 
 ### Performance Notes
+
 - All calculations memoized with useMemo/useCallback
 - SVG paths pre-calculated
 - Non-passive wheel events for zoom control
@@ -57,17 +59,34 @@ src/
 ## Coding Rules
 
 ### Component Structure
+
 - **Keep components clean and focused** - Components should only handle rendering and basic prop management
 - **Extract logic into custom hooks** - All state management, effects, and complex logic must go into custom hooks in `src/hooks/`
 - **Use utility functions** - All calculations, transformations, and pure functions must go into `src/utils/`
 - **Maximum component size** - Components should not exceed 100-150 lines. If larger, extract logic into hooks/utils
+- **Break down complex rendering** - Don't render too much in a single component block. Extract rendered elements into separate components for better maintainability and reusability
+- **Component composition** - Prefer composition over large monolithic components. Create smaller, focused components that can be combined
+
+### Accessibility Guidelines
+
+- **All interactive elements must be keyboard accessible** - Use proper tabIndex, onKeyDown handlers for Enter/Space
+- **Provide ARIA labels and roles** - Use role, aria-label, aria-describedby for screen readers
+- **Include screen reader instructions** - Add hidden instructions using .sr-only class
+- **Focus management** - Ensure proper focus styling and logical tab order
+- **Semantic HTML** - Use appropriate HTML elements and ARIA roles
 
 ### Hook Guidelines
+
 - **Single responsibility** - Each hook should handle one specific concern (state, interactions, calculations, etc.)
 - **Reusable** - Design hooks to be potentially reusable across components
 - **Clear naming** - Use descriptive names like `useMapInteractions`, `useMapState`
 
-### Utility Guidelines  
+### Utility Guidelines
+
 - **Pure functions** - Utility functions should be pure (no side effects)
 - **Well documented** - Include JSDoc comments for complex calculations
 - **Testable** - Structure utilities to be easily unit tested
+
+## Accessibility Guidelines
+
+- When adding new elements and content always make sure they are accessible according to a11y standard

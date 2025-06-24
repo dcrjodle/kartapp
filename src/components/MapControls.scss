@@ -1,0 +1,134 @@
+/**
+ * MapControls Component Styles
+ */
+
+@use "sass:color";
+
+// Variables
+$control-background: white;
+$control-shadow: rgba(0, 0, 0, 0.2);
+$control-text: #666;
+$button-background: #4a90e2;
+$button-text: white;
+
+// Mixins
+@mixin shadow-box {
+  box-shadow: 0 2px 5px $control-shadow;
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+// Map controls
+.map-controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: $control-background;
+  padding: 10px;
+  border-radius: 5px;
+  @include shadow-box;
+  z-index: 10;
+
+  // Control information display
+  &__info {
+    font-size: 12px;
+    color: $control-text;
+    margin-bottom: 5px;
+    line-height: 1.4;
+
+    &-item {
+      margin-bottom: 2px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // Zoom disabled indicator
+  &__zoom-disabled {
+    color: #999;
+    font-style: italic;
+    font-size: 10px;
+  }
+
+  // Button container
+  &__buttons {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  // Reset button
+  &__reset-button {
+    @include button-reset;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: $button-background;
+    color: $button-text;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: color.adjust($button-background, $lightness: -10%);
+    }
+
+    &:active {
+      background-color: color.adjust($button-background, $lightness: -15%);
+    }
+
+    &:focus {
+      outline: 2px solid color.adjust($button-background, $lightness: 20%);
+      outline-offset: 2px;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .map-controls {
+    top: 5px;
+    left: 5px;
+    padding: 8px;
+
+    &__info {
+      font-size: 11px;
+    }
+
+    &__reset-button {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .map-controls {
+    padding: 6px;
+
+    &__info {
+      font-size: 10px;
+    }
+
+    &__reset-button {
+      padding: 3px 6px;
+      font-size: 10px;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .map-controls {
+    &__reset-button {
+      transition: none;
+    }
+  }
+}

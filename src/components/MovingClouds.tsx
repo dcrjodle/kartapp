@@ -9,7 +9,7 @@ interface MovingCloudsProps {
 const MovingClouds: React.FC<MovingCloudsProps> = ({ zoom, selectedProvince }) => {
   // Adjust cloud count and size based on province selection
   const isProvinceSelected = selectedProvince !== null;
-  const cloudCount = isProvinceSelected ? 4 : 8; // Fewer clouds when province selected
+  const cloudCount = isProvinceSelected ? 6 : 12; // Fewer clouds when province selected
   const provinceSizeMultiplier = isProvinceSelected ? 1.3 : 1; // Larger clouds when province selected
   
   // Generate clouds based on current count

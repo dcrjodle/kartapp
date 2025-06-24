@@ -19,6 +19,9 @@ import {
   useGridLines,
   createResetViewFunction,
 } from "../utils/mapCalculations";
+import MapControls from "./MapControls";
+import MapGrid from "./MapGrid";
+import MapProvinces from "./MapProvinces";
 import "./CustomMap.scss";
 
 interface CustomMapProps {
@@ -148,7 +151,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
   }`;
 
   return (
-    <div className="custom-map">
+    <div className="custom-map" role="application" aria-label="Interactive map of Swedish provinces">
       {/* Main SVG map element */}
       <svg
         ref={svgRef}
@@ -158,120 +161,42 @@ const CustomMap: React.FC<CustomMapProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        role="img"
+        aria-label={`Map of Sweden showing ${provinces.length} provinces${selectedProvince ? `, with ${selectedProvince.name} selected` : ''}`}
+        tabIndex={0}
+        aria-describedby="map-instructions"
       >
-        {/* Grid pattern definition */}
-        <defs>
-          <pattern
-            id="grid"
-            width="100"
-            height="100"
-            patternUnits="userSpaceOnUse"
-            className="custom-map__grid-pattern"
-          >
-            <path d="M 100 0 L 0 0 0 100" className="grid-line" />
-          </pattern>
-        </defs>
-
-        {/* Background grid */}
-        <rect
-          width={mapDimensions.width}
-          height={mapDimensions.height}
-          className="custom-map__grid-background"
+        <MapGrid
+          mapDimensions={mapDimensions}
+          meridians={meridians}
+          parallels={parallels}
         />
 
-        {/* Longitude lines (meridians) */}
-        {meridians.map(({ x1, y1, x2, y2, key }) => (
-          <line
-            key={key}
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            className="custom-map__meridian"
-          />
-        ))}
-
-        {/* Latitude lines (parallels) */}
-        {parallels.map(({ x1, y1, x2, y2, key }) => (
-          <line
-            key={key}
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            className="custom-map__parallel"
-          />
-        ))}
-
-        {/* Province polygons */}
-        {(showOnlySelected && selectedProvince
-          ? [selectedProvince]
-          : provinces
-        ).map((province, displayIndex) => {
-          const originalIndex =
-            showOnlySelected && selectedProvince
-              ? provinces.findIndex((p) => p.id === province.id)
-              : displayIndex;
-          const pathData = provincePaths[originalIndex];
-
-          return (
-            <path
-              key={province.id || originalIndex}
-              d={pathData}
-              className={`custom-map__province ${
-                selectedProvince?.id === province.id
-                  ? "custom-map__province--selected"
-                  : ""
-              }`}
-              onClick={() => handleProvinceClick(province, originalIndex)}
-            >
-              <title>{province.name}</title>
-            </path>
-          );
-        })}
+        <MapProvinces
+          provinces={provinces}
+          provincePaths={provincePaths}
+          selectedProvince={selectedProvince}
+          showOnlySelected={showOnlySelected}
+          onProvinceClick={handleProvinceClick}
+        />
       </svg>
 
-      {/* Control panel */}
-      <div className="custom-map__controls">
-        <div className="custom-map__info">
-          <div className="custom-map__info-item">
-            Zoom: {zoom.toFixed(2)}
-            {showOnlySelected && selectedProvince && (
-              <span className="custom-map__zoom-disabled"> (disabled)</span>
-            )}
-          </div>
-          {selectedProvince && showOnlySelected ? (
-            <div className="custom-map__info-item">
-              Selected: {selectedProvince.name}
-            </div>
-          ) : (
-            <div className="custom-map__info-item">
-              Provinces: {provinces.length}
-            </div>
-          )}
-          <div className="custom-map__info-item">
-            Bounds: {bounds.minLat.toFixed(1)}°-{bounds.maxLat.toFixed(1)}°N,{" "}
-            {bounds.minLng.toFixed(1)}°-{bounds.maxLng.toFixed(1)}°E
-          </div>
-          <div className="custom-map__info-item">
-            ViewBox: ({viewBox.x.toFixed(0)}, {viewBox.y.toFixed(0)})
-          </div>
-        </div>
-        <div className="custom-map__buttons">
-          <button
-            onClick={resetView}
-            className="custom-map__reset-button"
-            type="button"
-            aria-label={
-              selectedProvince && showOnlySelected
-                ? "Show all provinces"
-                : "Reset map view to initial position"
-            }
-          >
-            {selectedProvince && showOnlySelected ? "Show All" : "Reset View"}
-          </button>
-        </div>
+      {/* Hidden instructions for screen readers */}
+      <div id="map-instructions" className="sr-only">
+        Interactive map of Swedish provinces. Use mouse to pan and zoom, or click provinces to select them. 
+        Use Tab to navigate between provinces, Enter or Space to select. Press Escape to reset view.
       </div>
+
+      {/* Control panel */}
+      <MapControls
+        zoom={zoom}
+        selectedProvince={selectedProvince}
+        showOnlySelected={showOnlySelected}
+        provinces={provinces}
+        bounds={bounds}
+        viewBox={viewBox}
+        onResetView={resetView}
+      />
     </div>
   );
 };
