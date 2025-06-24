@@ -132,29 +132,17 @@ $button-text: white;
     stroke: $province-stroke;
     stroke-width: 1;
     cursor: pointer;
-    transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
-
-    &:hover,
-    &:focus {
-      fill-opacity: 0.9;
-      stroke-width: 2;
-      outline: none;
-    }
 
     &:focus {
       stroke: #007acc;
       stroke-width: 3;
+      outline: none;
     }
 
     &--selected {
       fill-opacity: 0.9;
       stroke-width: 2;
       stroke: #e67e22;
-      
-      &:hover {
-        fill-opacity: 1;
-        stroke-width: 3;
-      }
     }
   }
 
