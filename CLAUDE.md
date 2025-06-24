@@ -6,7 +6,13 @@ This file provides guidance to Claude Code when working with this repository.
 
 - `npm start` - Start development server on http://localhost:3001
 - `npm run build` - Build for production
-- `npm test` - Run tests
+- `npm test` - Run all Cypress tests
+- `npm run test:open` - Open Cypress test runner GUI
+- `npm run test:controls` - Run map controls tests only
+- `npm run test:provinces` - Run province interaction tests only
+- `npm run test:cities` - Run city marker tests only
+- `npm run test:clouds` - Run cloud animation tests only
+- `npm run test:accessibility` - Run accessibility tests only
 
 ## Git Workflow
 
@@ -142,3 +148,62 @@ src/
 ## Accessibility Guidelines
 
 - When adding new elements and content always make sure they are accessible according to a11y standard
+
+## Testing Guidelines
+
+### Test Requirements
+
+**ALWAYS run tests when making changes to UI features** - Every change to map controls, provinces, cities, clouds, or accessibility features must be tested before committing.
+
+### Feature-Specific Test Mapping
+
+When modifying specific features, run the corresponding test suites:
+
+#### Map Controls Changes
+- **Run**: `npm run test:controls`
+- **When**: Modifying zoom, pan, reset functionality, mouse/wheel interactions, or control button behavior
+- **Tests**: Zoom in/out buttons, mouse wheel zoom, pan with drag, reset view, keyboard navigation
+
+#### Province Interactions Changes
+- **Run**: `npm run test:provinces`
+- **When**: Modifying province hover effects, selection logic, province styling, or province information display
+- **Tests**: Province hover states, click selection, deselection, province info display, cloud opacity changes
+
+#### City Markers Changes
+- **Run**: `npm run test:cities`
+- **When**: Modifying city visibility logic, city marker styling, city interactions, or city data display
+- **Tests**: City visibility on province selection, city marker interactions, scaling with zoom, hover effects
+
+#### Cloud Animations Changes
+- **Run**: `npm run test:clouds`
+- **When**: Modifying cloud animations, opacity changes, or cloud layering
+- **Tests**: Cloud animation continuity, opacity changes with province selection, responsive behavior
+
+#### Accessibility Features Changes
+- **Run**: `npm run test:accessibility`
+- **When**: Modifying keyboard navigation, ARIA labels, focus management, or screen reader support
+- **Tests**: Keyboard navigation, ARIA compliance, focus indicators, reduced motion support
+
+#### Major UI Changes
+- **Run**: `npm test` (all tests)
+- **When**: Making changes that affect multiple UI components or core map functionality
+- **Tests**: Complete test suite covering all features
+
+### Test Integration Workflow
+
+1. **Before starting development**: Run relevant test suite to ensure baseline functionality
+2. **During development**: Run specific tests frequently to catch regressions early
+3. **Before committing**: Run all affected test suites to ensure no breaking changes
+4. **For accessibility changes**: Always run accessibility tests in addition to feature tests
+
+### Test Data Requirements
+
+Tests require specific `data-testid` attributes on components:
+- Map: `data-testid="custom-map"`
+- Controls: `data-testid="map-controls"`
+- Zoom buttons: `data-testid="zoom-in"`, `data-testid="zoom-out"`
+- Reset button: `data-testid="reset-view"`
+- Provinces: `data-testid="province-{provinceName}"`
+- Cities: `data-testid="city-{cityName}"`
+- Clouds: `data-testid="clouds"`
+- Info displays: `data-testid="province-info"`, `data-testid="city-info"`
