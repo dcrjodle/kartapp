@@ -13,7 +13,7 @@ const App: React.FC = () => {
   // Process city data on component mount
   useEffect(() => {
     const processedCities = processCityData(swedishCitiesData);
-    const filteredCities = filterCitiesByPopulation(processedCities, 300000); // Show cities with 300k+ population
+    const filteredCities = filterCitiesByPopulation(processedCities, 30000); // Show cities with 30k+ population
     setCities(filteredCities);
   }, []);
 

@@ -17,14 +17,13 @@ $city-label-background: rgba(255, 255, 255, 0.8);
   fill: $city-color-small;
   stroke: white;
   stroke-width: 1;
-  transition: all 0.2s ease;
+  transition: stroke-width 0.2s ease, opacity 0.2s ease;
   
   &:hover,
   &:focus {
-    stroke-width: 2;
-    transform: scale(1.3);
+    stroke-width: 3;
     outline: none;
-    opacity: 0.9;
+    opacity: 0.8;
   }
   
   // Size variations based on population
@@ -70,10 +69,5 @@ $city-label-background: rgba(255, 255, 255, 0.8);
 @media (prefers-reduced-motion: reduce) {
   .city-marker {
     transition: none;
-    
-    &:hover,
-    &:focus {
-      transform: none;
-    }
   }
 }

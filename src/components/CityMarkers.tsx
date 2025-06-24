@@ -36,7 +36,7 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
 
     // Filter by province selection and minimum population
     return cities.filter(city => 
-      city.population >= 300000 && // Only cities with 300k+ population
+      city.population >= 30000 && // Only cities with 30k+ population
       (city.admin_name.toLowerCase().includes(selectedProvince.name.toLowerCase()) ||
        city.name.toLowerCase().includes(selectedProvince.name.toLowerCase()))
     );

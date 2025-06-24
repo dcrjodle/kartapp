@@ -43,8 +43,8 @@ export const filterCitiesByPopulation = (
  * Get city size category for styling
  */
 export const getCitySizeCategory = (population: number): 'small' | 'medium' | 'large' | 'major' => {
-  if (population >= 1000000) return 'major';
-  if (population >= 500000) return 'large';
-  if (population >= 100000) return 'medium';
+  if (population >= 500000) return 'major';
+  if (population >= 200000) return 'large';
+  if (population >= 80000) return 'medium';
   return 'small';
 };
