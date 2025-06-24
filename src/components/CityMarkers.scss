@@ -26,24 +26,20 @@ $city-label-background: rgba(255, 255, 255, 0.9);
     opacity: 0.8;
   }
   
-  // Size variations based on population
+  // Size variations based on population (radius set dynamically in component)
   &--small {
-    r: 8;
     fill: $city-color-small;
   }
   
   &--medium {
-    r: 10;
     fill: $city-color-medium;
   }
   
   &--large {
-    r: 12;
     fill: $city-color-large;
   }
   
   &--major {
-    r: 15;
     fill: $city-color-major;
   }
 }
@@ -51,7 +47,6 @@ $city-label-background: rgba(255, 255, 255, 0.9);
 // City marker group and tooltip
 .city-marker-group {
   .city-tooltip {
-    font-size: 14px;
     font-weight: 600;
     fill: $city-label-color;
     stroke: $city-label-background;
@@ -60,6 +55,7 @@ $city-label-background: rgba(255, 255, 255, 0.9);
     opacity: 0;
     transition: opacity 0.1s ease;
     pointer-events: none;
+    // font-size set dynamically in component
   }
   
   &:hover .city-tooltip {
@@ -69,16 +65,7 @@ $city-label-background: rgba(255, 255, 255, 0.9);
 
 // Responsive adjustments
 @media (max-width: 768px) {
-  .city-marker {
-    &--small { r: 6; }
-    &--medium { r: 7; }
-    &--large { r: 8; }
-    &--major { r: 10; }
-  }
-  
-  .city-marker-group .city-tooltip {
-    font-size: 12px;
-  }
+  // Sizes handled dynamically in component
 }
 
 // High contrast mode

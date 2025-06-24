@@ -50,11 +50,26 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
         const [x, y] = projectToSVG(city.lng, city.lat, bounds, mapDimensions);
         const sizeCategory = getCitySizeCategory(city.population);
         
+        // Calculate base sizes for different population categories
+        const baseSizes = {
+          small: 8,
+          medium: 10,
+          large: 12,
+          major: 15
+        };
+        
+        // Scale inversely with zoom to maintain consistent visual size
+        const scaleFactor = zoom;
+        const adjustedRadius = baseSizes[sizeCategory] * scaleFactor;
+        const adjustedFontSize = 14 * scaleFactor;
+        const adjustedTextOffset = 20 * scaleFactor;
+        
         return (
           <g key={city.id} className="city-marker-group">
             <circle
               cx={x}
               cy={y}
+              r={adjustedRadius}
               className={`city-marker city-marker--${sizeCategory}`}
               role="button"
               tabIndex={0}
@@ -67,10 +82,11 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
             {/* Custom tooltip */}
             <text
               x={x}
-              y={y - 20}
+              y={y - adjustedTextOffset}
               className="city-tooltip"
               textAnchor="middle"
               pointerEvents="none"
+              fontSize={adjustedFontSize}
             >
               {city.name}
             </text>
