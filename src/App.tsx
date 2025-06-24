@@ -1,11 +1,12 @@
 import React from "react";
 import CustomMap from "./components/CustomMap";
+import MovingClouds from "./components/MovingClouds";
 import { provincesData } from "./data/sweden_provinces";
 
 const App: React.FC = () => {
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      {/* <MovingClouds /> */}
+      <MovingClouds />
       <CustomMap provinces={provincesData} />
     </div>
   );

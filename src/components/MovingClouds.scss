@@ -9,175 +9,114 @@
   z-index: 1;
 }
 
-.cloud {
+.cloud-filters {
   position: absolute;
-  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%);
-  border-radius: 50px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 -10px 20px rgba(0, 0, 0, 0.05);
-  
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.08),
-      inset 0 -5px 10px rgba(0, 0, 0, 0.03);
-  }
+  width: 0;
+  height: 0;
 }
 
-// Cloud 1 - Large fluffy cloud
+.cloud-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: url(#cloud-filter);
+  background: rgba(255, 255, 255, 0.1); // Nearly transparent source element
+}
+
+// Cloud variations - position source element off-screen, use box-shadow for visible cloud
 .cloud-1 {
-  width: 120px;
-  height: 60px;
-  top: 15%;
-  border-radius: 60px 80px 40px 70px;
-  animation: moveCloudRight 28s linear infinite;
-  
-  &::before {
-    width: 80px;
-    height: 80px;
-    top: -40px;
-    left: 20px;
-    border-radius: 40px 60px 50px 45px;
-  }
-  
-  &::after {
-    width: 70px;
-    height: 40px;
-    top: -20px;
-    right: 10px;
-    border-radius: 35px 45px 30px 40px;
-  }
+  width: 400px;
+  height: 220px;
+  top: -400px; // Move source element far off-screen
+  left: -500px;
+  box-shadow: 450px 420px 60px 0px rgba(255, 255, 255, 0.8); // Shadow creates visible cloud
+  animation: moveCloudRight 180s linear infinite;
 }
 
-// Cloud 2 - Wispy cloud
 .cloud-2 {
-  width: 90px;
-  height: 45px;
-  top: 35%;
-  border-radius: 45px 60px 30px 50px;
-  animation: moveCloudLeft 20s linear infinite;
-  transform: scale(0.85);
-  opacity: 0.85;
-  
-  &::before {
-    width: 60px;
-    height: 60px;
-    top: -30px;
-    left: 15px;
-    border-radius: 30px 40px 35px 45px;
-  }
-  
-  &::after {
-    width: 55px;
-    height: 25px;
-    top: -12px;
-    right: 10px;
-    border-radius: 25px 35px 20px 30px;
-  }
+  width: 300px;
+  height: 165px;
+  top: -350px;
+  right: -400px;
+  box-shadow: 350px 320px 45px 0px rgba(255, 255, 255, 0.7);
+  animation: moveCloudLeft 220s linear infinite;
+  animation-delay: -60s;
 }
 
-// Cloud 3 - Small puffy cloud
 .cloud-3 {
-  width: 70px;
-  height: 35px;
-  top: 10%;
-  border-radius: 35px 45px 25px 40px;
-  animation: moveCloudRight 16s linear infinite;
-  transform: scale(0.7);
-  opacity: 0.75;
-  
-  &::before {
-    width: 45px;
-    height: 45px;
-    top: -22px;
-    left: 12px;
-    border-radius: 22px 30px 25px 28px;
-  }
-  
-  &::after {
-    width: 40px;
-    height: 20px;
-    top: -10px;
-    right: 8px;
-    border-radius: 20px 25px 15px 22px;
-  }
+  width: 350px;
+  height: 190px;
+  top: -380px;
+  left: -450px;
+  box-shadow: 400px 580px 50px 0px rgba(255, 255, 255, 0.6); // Position shadow at 20vh equivalent
+  animation: moveCloudRight 250s linear infinite;
+  animation-delay: -120s;
 }
 
-// Cloud 4 - Billowing cloud
 .cloud-4 {
-  width: 140px;
-  height: 55px;
-  top: 45%;
-  border-radius: 70px 85px 45px 65px;
-  animation: moveCloudLeft 24s linear infinite;
-  transform: scale(0.95);
-  opacity: 0.9;
-  animation-delay: -12s;
-  
-  &::before {
-    width: 85px;
-    height: 85px;
-    top: -42px;
-    left: 25px;
-    border-radius: 42px 55px 45px 50px;
-  }
-  
-  &::after {
-    width: 75px;
-    height: 35px;
-    top: -18px;
-    right: 15px;
-    border-radius: 37px 45px 30px 40px;
-  }
+  width: 280px;
+  height: 155px;
+  top: -320px;
+  right: -350px;
+  box-shadow: 300px 720px 40px 0px rgba(255, 255, 255, 0.5); // Position shadow at 40vh equivalent
+  animation: moveCloudLeft 200s linear infinite;
+  animation-delay: -90s;
 }
 
-// Cloud 5 - Stretched cloud
 .cloud-5 {
-  width: 110px;
-  height: 42px;
-  top: 28%;
-  border-radius: 55px 70px 35px 60px;
-  animation: moveCloudRight 22s linear infinite;
-  transform: scale(0.8);
-  opacity: 0.8;
-  animation-delay: -18s;
-  
-  &::before {
-    width: 65px;
-    height: 65px;
-    top: -32px;
-    left: 18px;
-    border-radius: 32px 42px 35px 38px;
-  }
-  
-  &::after {
-    width: 60px;
-    height: 25px;
-    top: -12px;
-    right: 15px;
-    border-radius: 30px 35px 22px 32px;
-  }
+  width: 450px;
+  height: 250px;
+  top: -500px;
+  left: -550px;
+  box-shadow: 500px 1100px 70px 0px rgba(255, 255, 255, 0.9); // Position shadow at 60vh equivalent
+  animation: moveCloudRight 160s linear infinite;
+  animation-delay: -150s;
+}
+
+.cloud-6 {
+  width: 320px;
+  height: 175px;
+  top: -370px;
+  right: -420px;
+  box-shadow: 380px 470px 48px 0px rgba(255, 255, 255, 0.6); // Position shadow at 15vh equivalent
+  animation: moveCloudLeft 280s linear infinite;
+  animation-delay: -30s;
+}
+
+.cloud-7 {
+  width: 380px;
+  height: 210px;
+  top: -430px;
+  right: -480px;
+  box-shadow: 440px 1305px 55px 0px rgba(255, 255, 255, 0.7); // Position shadow at 75vh equivalent
+  animation: moveCloudLeft 240s linear infinite;
+  animation-delay: -180s;
+}
+
+.cloud-8 {
+  width: 250px;
+  height: 140px;
+  top: -300px;
+  left: -350px;
+  box-shadow: 300px 735px 35px 0px rgba(255, 255, 255, 0.5); // Position shadow at 35vh equivalent
+  animation: moveCloudRight 300s linear infinite;
+  animation-delay: -45s;
 }
 
 // Animation keyframes
 @keyframes moveCloudRight {
   0% {
-    left: -200px;
+    transform: translateX(-100px);
   }
   100% {
-    left: 100vw;
+    transform: translateX(calc(100vw + 200px));
   }
 }
 
 @keyframes moveCloudLeft {
   0% {
-    right: -200px;
+    transform: translateX(100px);
   }
   100% {
-    right: 100vw;
+    transform: translateX(calc(-100vw - 200px));
   }
 }
