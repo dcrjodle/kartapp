@@ -51,18 +51,30 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
         const sizeCategory = getCitySizeCategory(city.population);
         
         return (
-          <circle
-            key={city.id}
-            cx={x}
-            cy={y}
-            className={`city-marker city-marker--${sizeCategory}`}
-            role="button"
-            tabIndex={0}
-            aria-label={`${city.name}, population ${city.population.toLocaleString()}`}
-          >
-            {/* Tooltip title for hover */}
-            <title>{city.name}</title>
-          </circle>
+          <g key={city.id} className="city-marker-group">
+            <circle
+              cx={x}
+              cy={y}
+              className={`city-marker city-marker--${sizeCategory}`}
+              role="button"
+              tabIndex={0}
+              aria-label={`${city.name}, population ${city.population.toLocaleString()}`}
+              data-city-name={city.name}
+            >
+              {/* Tooltip title for hover */}
+              <title>{city.name}</title>
+            </circle>
+            {/* Custom tooltip */}
+            <text
+              x={x}
+              y={y - 20}
+              className="city-tooltip"
+              textAnchor="middle"
+              pointerEvents="none"
+            >
+              {city.name}
+            </text>
+          </g>
         );
       })}
     </g>

@@ -9,15 +9,15 @@ $city-color-medium: #ffaa44;
 $city-color-small: #ffcc44;
 
 $city-label-color: #333;
-$city-label-background: rgba(255, 255, 255, 0.8);
+$city-label-background: rgba(255, 255, 255, 0.9);
 
 // City marker styles
 .city-marker {
   cursor: pointer;
   fill: $city-color-small;
-  stroke: white;
-  stroke-width: 1;
-  transition: stroke-width 0.2s ease, opacity 0.2s ease;
+  stroke: #333;
+  stroke-width: 1.5;
+  transition: stroke-width 0.1s ease, opacity 0.1s ease;
   
   &:hover,
   &:focus {
@@ -28,33 +28,56 @@ $city-label-background: rgba(255, 255, 255, 0.8);
   
   // Size variations based on population
   &--small {
-    r: 4;
+    r: 6;
     fill: $city-color-small;
   }
   
   &--medium {
-    r: 6;
+    r: 8;
     fill: $city-color-medium;
   }
   
   &--large {
-    r: 8;
+    r: 10;
     fill: $city-color-large;
   }
   
   &--major {
-    r: 10;
+    r: 12;
     fill: $city-color-major;
+  }
+}
+
+// City marker group and tooltip
+.city-marker-group {
+  .city-tooltip {
+    font-size: 12px;
+    font-weight: 600;
+    fill: $city-label-color;
+    stroke: $city-label-background;
+    stroke-width: 3;
+    paint-order: stroke fill;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    pointer-events: none;
+  }
+  
+  &:hover .city-tooltip {
+    opacity: 1;
   }
 }
 
 // Responsive adjustments
 @media (max-width: 768px) {
   .city-marker {
-    &--small { r: 3; }
-    &--medium { r: 4; }
-    &--large { r: 5; }
-    &--major { r: 6; }
+    &--small { r: 4; }
+    &--medium { r: 5; }
+    &--large { r: 6; }
+    &--major { r: 7; }
+  }
+  
+  .city-marker-group .city-tooltip {
+    font-size: 10px;
   }
 }
 
