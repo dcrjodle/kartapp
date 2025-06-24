@@ -58,8 +58,12 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
           major: 15
         };
         
-        // Scale inversely with zoom to maintain consistent visual size
-        const scaleFactor = zoom;
+        // Calculate scale factor based on map dimensions to handle aspect ratio differences
+        // Use the smaller dimension to ensure consistent sizing across all province shapes
+        const baseMapSize = 1000; // Base reference size from mapProjection.ts
+        const currentMapScale = Math.min(mapDimensions.width, mapDimensions.height) / baseMapSize;
+        const scaleFactor = Math.max(currentMapScale * zoom, 0.8); // Minimum scale factor
+        
         const adjustedRadius = baseSizes[sizeCategory] * scaleFactor;
         const adjustedFontSize = 14 * scaleFactor;
         const adjustedTextOffset = 20 * scaleFactor;
