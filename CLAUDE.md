@@ -23,6 +23,13 @@ Use conventional commit format:
 - `refactor:` - Code refactoring
 - `style:` - Styling changes
 
+### Commit Requirements
+
+- **Commit each change** - Always commit when making changes to the codebase
+- **Frequent commits** - Don't batch multiple unrelated changes into one commit
+- **Descriptive messages** - Use clear, descriptive commit messages that explain what was changed
+- **One logical change per commit** - Each commit should represent one logical change or fix
+
 ## Project Overview
 
 React TypeScript application displaying Swedish municipalities on an interactive SVG map using custom Mercator projection. No external mapping libraries used.
@@ -86,6 +93,23 @@ src/
 - **Pure functions** - Utility functions should be pure (no side effects)
 - **Well documented** - Include JSDoc comments for complex calculations
 - **Testable** - Structure utilities to be easily unit tested
+
+### Data Folder Guidelines
+
+- **Data only** - The `src/data/` folder should only contain data files and type definitions
+- **No utility functions** - Never export utility functions from data files
+- **One enabler function maximum** - Only include simple data transformation functions if absolutely necessary
+- **Import utilities directly** - Components and hooks should import utility functions directly from `src/utils/`
+
+### Naming Conventions
+
+- **File naming** - Use descriptive names that reflect the file's purpose
+  - Utils: `mapProjection.ts`, `cityDataProcessing.ts`, `mapCalculations.ts`
+  - Components: `CustomMap.tsx`, `MapControls.tsx`, `CityMarkers.tsx`
+  - Hooks: `useMapState.ts`, `useMapInteractions.ts`
+  - Data: `sweden_provinces.ts`, `swedish-cities.json`
+- **Consistency within folders** - All files in a folder should follow the same naming pattern
+- **Avoid duplicates** - Never create duplicate interfaces or types across files
 
 ## Accessibility Guidelines
 

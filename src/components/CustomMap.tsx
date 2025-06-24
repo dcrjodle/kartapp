@@ -22,11 +22,15 @@ import {
 import MapControls from "./MapControls";
 import MapGrid from "./MapGrid";
 import MapProvinces from "./MapProvinces";
+import CityMarkers from "./CityMarkers";
+import { type SwedishCity } from "../utils/cityDataProcessing";
 import "./CustomMap.scss";
 
 interface CustomMapProps {
   /** Array of county data with coordinate polygons */
   provinces: Provinces[];
+  /** Array of city data with coordinates */
+  cities?: SwedishCity[];
   /** Interval in degrees for grid lines (default: 2) */
   gridInterval?: number;
   /** Initial zoom level (default: 1) */
@@ -46,6 +50,7 @@ interface CustomMapProps {
  */
 const CustomMap: React.FC<CustomMapProps> = ({
   provinces,
+  cities = [],
   gridInterval = 2,
   initialZoom = 1,
   minZoom = 0.1,
@@ -178,6 +183,15 @@ const CustomMap: React.FC<CustomMapProps> = ({
           selectedProvince={selectedProvince}
           showOnlySelected={showOnlySelected}
           onProvinceClick={handleProvinceClick}
+        />
+
+        <CityMarkers
+          cities={cities}
+          bounds={bounds}
+          mapDimensions={mapDimensions}
+          zoom={zoom}
+          selectedProvince={selectedProvince}
+          showCities={true}
         />
       </svg>
 

@@ -1,0 +1,152 @@
+/**
+ * CityMarkers Component Styles
+ */
+
+// Variables
+$city-color-major: #ff4444;
+$city-color-large: #ff8844;
+$city-color-medium: #ffaa44;
+$city-color-small: #ffcc44;
+
+$city-label-color: #333;
+$city-label-background: rgba(255, 255, 255, 0.8);
+
+// City marker styles
+.city-marker {
+  cursor: pointer;
+  
+  &__circle {
+    fill: $city-color-small;
+    stroke: white;
+    stroke-width: 1;
+    transition: all 0.2s ease;
+    
+    &:hover,
+    &:focus {
+      stroke-width: 2;
+      transform: scale(1.2);
+      outline: none;
+    }
+  }
+  
+  &__label {
+    font-size: 10px;
+    font-weight: 500;
+    fill: $city-label-color;
+    stroke: $city-label-background;
+    stroke-width: 3;
+    paint-order: stroke fill;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  
+  // Size variations
+  &--small {
+    .city-marker__circle {
+      r: 3;
+      fill: $city-color-small;
+    }
+    
+    .city-marker__label {
+      font-size: 9px;
+      opacity: 0.8;
+    }
+  }
+  
+  &--medium {
+    .city-marker__circle {
+      r: 4;
+      fill: $city-color-medium;
+    }
+    
+    .city-marker__label {
+      font-size: 10px;
+      opacity: 0.9;
+    }
+  }
+  
+  &--large {
+    .city-marker__circle {
+      r: 5;
+      fill: $city-color-large;
+    }
+    
+    .city-marker__label {
+      font-size: 11px;
+      font-weight: 600;
+    }
+  }
+  
+  &--major {
+    .city-marker__circle {
+      r: 6;
+      fill: $city-color-major;
+    }
+    
+    .city-marker__label {
+      font-size: 12px;
+      font-weight: 700;
+    }
+  }
+  
+  // Hover effects
+  &:hover {
+    .city-marker__label {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .city-marker {
+    &__label {
+      font-size: 8px;
+    }
+    
+    &--small .city-marker__label {
+      font-size: 7px;
+    }
+    
+    &--medium .city-marker__label {
+      font-size: 8px;
+    }
+    
+    &--large .city-marker__label {
+      font-size: 9px;
+    }
+    
+    &--major .city-marker__label {
+      font-size: 10px;
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .city-marker {
+    &__circle {
+      stroke-width: 2;
+    }
+    
+    &__label {
+      stroke-width: 4;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .city-marker {
+    &__circle,
+    &__label {
+      transition: none;
+    }
+    
+    &__circle:hover,
+    &__circle:focus {
+      transform: none;
+    }
+  }
+}
