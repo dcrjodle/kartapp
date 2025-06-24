@@ -28,7 +28,9 @@
   height: 220px;
   top: -400px; // Move source element far off-screen
   left: -500px;
-  box-shadow: 450px 420px 60px 0px rgba(255, 255, 255, 0.8); // Shadow creates visible cloud
+  box-shadow: 
+    450px 420px 60px 0px rgba(255, 255, 255, 0.8), // Main cloud
+    470px 470px 30px 5px rgba(0, 0, 0, 0.1); // Ground shadow
   animation: moveCloudRight 180s linear infinite;
 }
 
@@ -37,7 +39,9 @@
   height: 165px;
   top: -350px;
   right: -400px;
-  box-shadow: 350px 320px 45px 0px rgba(255, 255, 255, 0.7);
+  box-shadow: 
+    350px 320px 45px 0px rgba(255, 255, 255, 0.7), // Main cloud
+    365px 360px 25px 3px rgba(0, 0, 0, 0.08); // Ground shadow
   animation: moveCloudLeft 220s linear infinite;
   animation-delay: -60s;
 }
@@ -47,7 +51,9 @@
   height: 190px;
   top: -380px;
   left: -450px;
-  box-shadow: 400px 580px 50px 0px rgba(255, 255, 255, 0.6); // Position shadow at 20vh equivalent
+  box-shadow: 
+    400px 580px 50px 0px rgba(255, 255, 255, 0.6), // Main cloud
+    418px 625px 28px 4px rgba(0, 0, 0, 0.09); // Ground shadow
   animation: moveCloudRight 250s linear infinite;
   animation-delay: -120s;
 }
@@ -57,7 +63,9 @@
   height: 155px;
   top: -320px;
   right: -350px;
-  box-shadow: 300px 720px 40px 0px rgba(255, 255, 255, 0.5); // Position shadow at 40vh equivalent
+  box-shadow: 
+    300px 720px 40px 0px rgba(255, 255, 255, 0.5), // Main cloud
+    314px 755px 22px 3px rgba(0, 0, 0, 0.07); // Ground shadow
   animation: moveCloudLeft 200s linear infinite;
   animation-delay: -90s;
 }
@@ -67,7 +75,9 @@
   height: 250px;
   top: -500px;
   left: -550px;
-  box-shadow: 500px 1100px 70px 0px rgba(255, 255, 255, 0.9); // Position shadow at 60vh equivalent
+  box-shadow: 
+    500px 1100px 70px 0px rgba(255, 255, 255, 0.9), // Main cloud
+    523px 1155px 38px 6px rgba(0, 0, 0, 0.12); // Ground shadow
   animation: moveCloudRight 160s linear infinite;
   animation-delay: -150s;
 }
@@ -77,7 +87,9 @@
   height: 175px;
   top: -370px;
   right: -420px;
-  box-shadow: 380px 470px 48px 0px rgba(255, 255, 255, 0.6); // Position shadow at 15vh equivalent
+  box-shadow: 
+    380px 470px 48px 0px rgba(255, 255, 255, 0.6), // Main cloud
+    396px 510px 26px 4px rgba(0, 0, 0, 0.08); // Ground shadow
   animation: moveCloudLeft 280s linear infinite;
   animation-delay: -30s;
 }
@@ -87,7 +99,9 @@
   height: 210px;
   top: -430px;
   right: -480px;
-  box-shadow: 440px 1305px 55px 0px rgba(255, 255, 255, 0.7); // Position shadow at 75vh equivalent
+  box-shadow: 
+    440px 1305px 55px 0px rgba(255, 255, 255, 0.7), // Main cloud
+    459px 1355px 30px 5px rgba(0, 0, 0, 0.09); // Ground shadow
   animation: moveCloudLeft 240s linear infinite;
   animation-delay: -180s;
 }
@@ -97,7 +111,9 @@
   height: 140px;
   top: -300px;
   left: -350px;
-  box-shadow: 300px 735px 35px 0px rgba(255, 255, 255, 0.5); // Position shadow at 35vh equivalent
+  box-shadow: 
+    300px 735px 35px 0px rgba(255, 255, 255, 0.5), // Main cloud
+    313px 770px 20px 3px rgba(0, 0, 0, 0.06); // Ground shadow
   animation: moveCloudRight 300s linear infinite;
   animation-delay: -45s;
 }
