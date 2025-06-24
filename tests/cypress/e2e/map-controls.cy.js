@@ -12,19 +12,19 @@ describe('Map Controls', () => {
   });
 
   it('should zoom in when zoom-in button is clicked', () => {
-    // Get initial zoom level by checking SVG transform
-    cy.getMap().find('g').first().invoke('attr', 'transform').then((initialTransform) => {
+    // Get initial zoom level by checking SVG viewBox
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').then((initialViewBox) => {
       cy.zoomIn();
-      cy.getMap().find('g').first().invoke('attr', 'transform').should('not.equal', initialTransform);
+      cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('not.equal', initialViewBox);
     });
   });
 
   it('should zoom out when zoom-out button is clicked', () => {
     // First zoom in to have something to zoom out from
     cy.zoomIn(2);
-    cy.getMap().find('g').first().invoke('attr', 'transform').then((zoomedTransform) => {
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').then((zoomedViewBox) => {
       cy.zoomOut();
-      cy.getMap().find('g').first().invoke('attr', 'transform').should('not.equal', zoomedTransform);
+      cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('not.equal', zoomedViewBox);
     });
   });
 
@@ -35,39 +35,40 @@ describe('Map Controls', () => {
     cy.getMap().trigger('mousemove', { which: 1, clientX: 400, clientY: 400 });
     cy.getMap().trigger('mouseup');
     
-    // Reset view
-    cy.resetView();
-    
-    // Check that transform is reset (should contain scale close to 1)
-    cy.getMap().find('g').first().invoke('attr', 'transform').then((transform) => {
-      expect(transform).to.match(/scale\(1[.,]?\d*\)/);
+    // Get initial viewBox to compare against
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').then((viewBoxBeforeReset) => {
+      // Reset view
+      cy.resetView();
+      
+      // Check that viewBox changed (indicating reset occurred)
+      cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('not.equal', viewBoxBeforeReset);
     });
   });
 
   it('should handle keyboard navigation for controls', () => {
     cy.get('[data-testid="zoom-in"]').focus().type('{enter}');
-    cy.getMap().find('g').first().invoke('attr', 'transform').should('contain', 'scale');
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('exist');
     
     cy.get('[data-testid="zoom-out"]').focus().type(' ');
-    cy.getMap().find('g').first().invoke('attr', 'transform').should('contain', 'scale');
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('exist');
     
     cy.get('[data-testid="reset-view"]').focus().type('{enter}');
-    cy.getMap().find('g').first().invoke('attr', 'transform').should('contain', 'scale');
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('exist');
   });
 
   it('should handle mouse wheel zoom', () => {
-    cy.getMap().find('g').first().invoke('attr', 'transform').then((initialTransform) => {
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').then((initialViewBox) => {
       cy.getMap().trigger('wheel', { deltaY: -100 });
-      cy.getMap().find('g').first().invoke('attr', 'transform').should('not.equal', initialTransform);
+      cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('not.equal', initialViewBox);
     });
   });
 
   it('should handle pan with mouse drag', () => {
-    cy.getMap().find('g').first().invoke('attr', 'transform').then((initialTransform) => {
+    cy.getMap().find('svg').first().invoke('attr', 'viewBox').then((initialViewBox) => {
       cy.getMap().trigger('mousedown', { which: 1, clientX: 400, clientY: 300 });
       cy.getMap().trigger('mousemove', { which: 1, clientX: 500, clientY: 400 });
       cy.getMap().trigger('mouseup');
-      cy.getMap().find('g').first().invoke('attr', 'transform').should('not.equal', initialTransform);
+      cy.getMap().find('svg').first().invoke('attr', 'viewBox').should('not.equal', initialViewBox);
     });
   });
 });

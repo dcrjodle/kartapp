@@ -37,7 +37,13 @@ const MapControls: React.FC<MapControlsProps> = ({
   
   return (
     <div className="map-controls" role="region" aria-label={t('map.title')} data-testid="map-controls">
-      <div className="map-controls__info">
+      <div className="map-controls__header">
+        <h2 className="map-controls__title">{t('map.title')}</h2>
+      </div>
+      
+      <div className="map-controls__section map-controls__section--info">
+        <h3 className="map-controls__section-title">{t('map.information')}</h3>
+        <div className="map-controls__info">
         <div className="map-controls__info-item">
           {t('map.zoom')}: {zoom.toFixed(2)}
           {showOnlySelected && selectedProvince && (
@@ -61,35 +67,45 @@ const MapControls: React.FC<MapControlsProps> = ({
           {t('map.viewBox')}: ({viewBox.x.toFixed(0)}, {viewBox.y.toFixed(0)})
         </div>
         {/* Placeholder for city info */}
-        <div className="map-controls__info-item" data-testid="city-info" style={{ display: 'none' }}>
-          City information placeholder
+          <div className="map-controls__info-item" data-testid="city-info" style={{ display: 'none' }}>
+            City information placeholder
+          </div>
         </div>
       </div>
-      <div className="map-controls__buttons">
-        {onZoomIn && (
-          <button
-            onClick={onZoomIn}
-            className="map-controls__zoom-button"
-            type="button"
-            data-testid="zoom-in"
-            aria-label={t('map.zoomIn')}
-            disabled={showOnlySelected && selectedProvince}
-          >
-            +
-          </button>
-        )}
-        {onZoomOut && (
-          <button
-            onClick={onZoomOut}
-            className="map-controls__zoom-button"
-            type="button"
-            data-testid="zoom-out"
-            aria-label={t('map.zoomOut')}
-            disabled={showOnlySelected && selectedProvince}
-          >
-            -
-          </button>
-        )}
+      
+      <div className="map-controls__section map-controls__section--controls">
+        <h3 className="map-controls__section-title">{t('map.controls')}</h3>
+        <div className="map-controls__buttons">
+        <div className="map-controls__zoom-buttons">
+          {onZoomIn && (
+            <button
+              onClick={onZoomIn}
+              className="map-controls__zoom-button"
+              type="button"
+              data-testid="zoom-in"
+              aria-label={t('map.zoomIn')}
+              disabled={showOnlySelected && !!selectedProvince}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          )}
+          {onZoomOut && (
+            <button
+              onClick={onZoomOut}
+              className="map-controls__zoom-button"
+              type="button"
+              data-testid="zoom-out"
+              aria-label={t('map.zoomOut')}
+              disabled={showOnlySelected && !!selectedProvince}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          )}
+        </div>
         <button
           onClick={onResetView}
           className="map-controls__reset-button"
@@ -103,6 +119,7 @@ const MapControls: React.FC<MapControlsProps> = ({
         >
           {selectedProvince && showOnlySelected ? t('map.showAll') : t('map.resetView')}
         </button>
+        </div>
       </div>
     </div>
   );

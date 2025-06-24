@@ -24,20 +24,65 @@
   top: 10px;
   left: 10px;
   background-color: $control-background;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 16px;
+  border-radius: 8px;
   @include shadow-box;
   z-index: 10;
+  min-width: 280px;
+  max-width: 320px;
+
+  // Header section
+  &__header {
+    margin-bottom: 16px;
+    border-bottom: 1px solid color.adjust($control-text, $alpha: -0.8);
+    padding-bottom: 8px;
+  }
+
+  // Title
+  &__title {
+    font-size: 18px;
+    font-weight: bold;
+    color: $control-text;
+    margin: 0;
+    text-align: center;
+  }
+
+  // Section containers
+  &__section {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &--info {
+      border-bottom: 1px solid color.adjust($control-text, $alpha: -0.8);
+      padding-bottom: 12px;
+    }
+
+    &--controls {
+      // No additional styling needed
+    }
+  }
+
+  // Section titles
+  &__section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $control-text;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
   // Control information display
   &__info {
-    font-size: 12px;
+    font-size: 14px;
     color: $control-text;
-    margin-bottom: 5px;
     line-height: 1.4;
 
     &-item {
-      margin-bottom: 2px;
+      margin-bottom: 4px;
 
       &:last-child {
         margin-bottom: 0;
@@ -54,21 +99,68 @@
 
   // Button container
   &__buttons {
-    margin-top: 8px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+  }
+
+  // Zoom buttons container
+  &__zoom-buttons {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+
+  // Zoom buttons
+  &__zoom-button {
+    @include button-reset;
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 16px;
+    font-weight: 700;
+    background-color: $button-background;
+    color: $button-text;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+
+    svg {
+      stroke-width: 2;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: color.adjust($button-background, $lightness: -10%);
+    }
+
+    &:active:not(:disabled) {
+      background-color: color.adjust($button-background, $lightness: -15%);
+    }
+
+    &:focus {
+      outline: 2px solid color.adjust($button-background, $lightness: 20%);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 
   // Reset button
   &__reset-button {
     @include button-reset;
-    padding: 5px 10px;
-    font-size: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
     background-color: $button-background;
     color: $button-text;
-    border-radius: 3px;
+    border-radius: 4px;
     transition: background-color 0.2s ease;
+    min-height: 32px;
 
     &:hover {
       background-color: color.adjust($button-background, $lightness: -10%);

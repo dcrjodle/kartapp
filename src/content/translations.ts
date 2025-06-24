@@ -9,6 +9,8 @@ export interface Translations {
   map: {
     title: string;
     instructions: string;
+    information: string;
+    controls: string;
     provinces: string;
     selected: string;
     zoom: string;
@@ -39,8 +41,10 @@ export interface Translations {
 export const translations: Record<SupportedLanguage, Translations> = {
   en: {
     map: {
-      title: 'Interactive map of Swedish provinces',
+      title: 'Interactive Map of Swedish Provinces',
       instructions: 'Interactive map of Swedish provinces. Use mouse to pan and zoom, or click provinces to select them. Use Tab to navigate between provinces, Enter or Space to select. Press Escape to reset view.',
+      information: 'Information',
+      controls: 'Controls',
       provinces: 'Provinces',
       selected: 'Selected',
       zoom: 'Zoom',
@@ -89,8 +93,10 @@ export const translations: Record<SupportedLanguage, Translations> = {
   },
   sv: {
     map: {
-      title: 'Interaktiv karta över svenska län',
+      title: 'Interaktiv Karta över Svenska Län',
       instructions: 'Interaktiv karta över svenska län. Använd musen för att panorera och zooma, eller klicka på län för att välja dem. Använd Tab för att navigera mellan län, Enter eller Mellanslag för att välja. Tryck Escape för att återställa vyn.',
+      information: 'Information',
+      controls: 'Kontroller',
       provinces: 'Län',
       selected: 'Valt',
       zoom: 'Zoom',
