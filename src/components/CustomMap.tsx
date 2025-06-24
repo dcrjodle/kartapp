@@ -36,6 +36,10 @@ interface CustomMapProps {
   minZoom?: number;
   /** Maximum allowed zoom level (default: 5) */
   maxZoom?: number;
+  /** Callback for zoom changes */
+  onZoomChange?: (zoom: number) => void;
+  /** Callback for province selection changes */
+  onProvinceChange?: (province: Provinces | null) => void;
 }
 
 /**
@@ -47,6 +51,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
   initialZoom = 1,
   minZoom = 0.1,
   maxZoom = 2,
+  onZoomChange,
+  onProvinceChange,
 }) => {
   // Custom hooks for state management
   const mapState = useMapState(initialZoom);
@@ -129,6 +135,16 @@ const CustomMap: React.FC<CustomMapProps> = ({
       height: mapDimensions.height,
     });
   }, [mapDimensions, setViewBox]);
+
+  // Call zoom change callback
+  useEffect(() => {
+    onZoomChange?.(zoom);
+  }, [zoom, onZoomChange]);
+
+  // Call province change callback
+  useEffect(() => {
+    onProvinceChange?.(selectedProvince);
+  }, [selectedProvince, onProvinceChange]);
 
   // Set up wheel event listener with passive: false to enable preventDefault
   useEffect(() => {
