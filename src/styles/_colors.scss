@@ -1,161 +1,49 @@
 /**
- * Modern Color System & Design Tokens
- * Sophisticated color palette inspired by Swedish design and modern UI trends
+ * Color Variables
+ * Central color definitions for the entire application
  */
 
-// Color Palette - Swedish Nature Inspired
-$swedish-blue: #005c98;
-$swedish-yellow: #ffcd00;
-$nordic-sea: #0066cc;
-$arctic-white: #f8fafc;
-$forest-green: #2d5a4a;
-$sunset-orange: #ff6b35;
-$midnight-blue: #1e293b;
-$aurora-purple: #8b5cf6;
+// Map background and grid colors
+$map-background: linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 50%, #e8f4fd 100%);
+$grid-color: #e0e0e0;
+$grid-line-color: #ccc;
 
-// Modern Neutral Palette
-$white: #ffffff;
-$gray-50: #f8fafc;
-$gray-100: #f1f5f9;
-$gray-200: #e2e8f0;
-$gray-300: #cbd5e1;
-$gray-400: #94a3b8;
-$gray-500: #64748b;
-$gray-600: #475569;
-$gray-700: #334155;
-$gray-800: #1e293b;
-$gray-900: #0f172a;
+// Province and region colors
+$province-fill: #4a90e2;
+$province-stroke: #2c5aa0;
+$province-selected-stroke: #e67e22;
+$province-focus-stroke: #007acc;
 
-// Semantic Colors  
-@use "sass:color";
-$primary: $swedish-blue;
-$primary-hover: color.adjust($swedish-blue, $lightness: -10%);
-$primary-light: color.adjust($swedish-blue, $lightness: 40%);
-$secondary: $nordic-sea;
-$accent: $swedish-yellow;
-$success: $forest-green;
-$warning: $sunset-orange;
-$danger: #ef4444;
-$info: $aurora-purple;
+// County colors (legacy)
+$county-fill: #4a90e2;
+$county-stroke: #2c5aa0;
+$detailed-county-fill: #e74c3c;
+$detailed-county-stroke: #c0392b;
 
-// Background System
-$bg-primary: $white;
-$bg-secondary: $gray-50;
-$bg-tertiary: $gray-100;
-$bg-overlay: rgba(255, 255, 255, 0.8);
-$bg-glass: rgba(255, 255, 255, 0.1);
-$bg-dark: $gray-900;
+// Sweden border color
+$sweden-border-color: #2c3e50;
 
-// Text System
-$text-primary: $gray-900;
-$text-secondary: $gray-600;
-$text-tertiary: $gray-500;
-$text-inverse: $white;
-$text-accent: $primary;
+// City marker colors
+$city-color-major: #ff4444;
+$city-color-large: #ff8844;
+$city-color-medium: #ffaa44;
+$city-color-small: #ffcc44;
 
-// Interactive Elements
-$button-primary-bg: $primary;
-$button-primary-text: $white;
-$button-primary-hover: $primary-hover;
-$button-secondary-bg: $gray-200;
-$button-secondary-text: $gray-700;
-$button-secondary-hover: $gray-300;
+// City label colors
+$city-label-color: #333;
+$city-label-background: rgba(255, 255, 255, 0.9);
 
-// Map Specific Colors
-$map-background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-$province-default: rgba($primary, 0.6);
-$province-hover: rgba($primary, 0.8);
-$province-selected: $primary;
-$province-border: rgba($primary, 0.3);
+// Control panel colors
+$control-background: white;
+$control-shadow: rgba(0, 0, 0, 0.2);
+$control-text: #666;
+$control-zoom-disabled: #999;
 
-// Legacy compatibility (keep for now)
-$province-fill: $province-default;
-$province-stroke: $province-border;
-$province-selected-stroke: $accent;
-$province-focus-stroke: $primary;
-$county-fill: $province-default;
-$county-stroke: $province-border;
-$detailed-county-fill: $danger;
-$detailed-county-stroke: color.adjust($danger, $lightness: -10%);
-$grid-color: $gray-300;
-$grid-line-color: $gray-400;
-$sweden-border-color: $gray-700;
-$control-background: $bg-glass;
-$control-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-$control-text: $text-primary;
-$control-zoom-disabled: $text-tertiary;
-$button-background: $button-primary-bg;
-$button-text: $button-primary-text;
-
-// Glassmorphism & Modern Effects
-$glass-background: rgba(255, 255, 255, 0.15);
-$glass-border: rgba(255, 255, 255, 0.2);
-$glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-$glass-backdrop: blur(8px);
-
-// Shadow System
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-
-// Border Radius System
-$radius-sm: 0.375rem;
-$radius-md: 0.5rem;
-$radius-lg: 0.75rem;
-$radius-xl: 1rem;
-$radius-2xl: 1.5rem;
-$radius-full: 9999px;
-
-// Spacing System (following 8pt grid)
-$space-1: 0.25rem;
-$space-2: 0.5rem;
-$space-3: 0.75rem;
-$space-4: 1rem;
-$space-5: 1.25rem;
-$space-6: 1.5rem;
-$space-8: 2rem;
-$space-10: 2.5rem;
-$space-12: 3rem;
-$space-16: 4rem;
-$space-20: 5rem;
-
-// Animation System
-$transition-fast: 150ms ease-in-out;
-$transition-base: 250ms ease-in-out;
-$transition-slow: 400ms ease-in-out;
-$transition-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-// Typography Scale
-$font-size-xs: 0.75rem;
-$font-size-sm: 0.875rem;
-$font-size-base: 1rem;
-$font-size-lg: 1.125rem;
-$font-size-xl: 1.25rem;
-$font-size-2xl: 1.5rem;
-$font-size-3xl: 1.875rem;
-$font-size-4xl: 2.25rem;
-
-$font-weight-light: 300;
-$font-weight-normal: 400;
-$font-weight-medium: 500;
-$font-weight-semibold: 600;
-$font-weight-bold: 700;
-
-// Line Heights
-$line-height-tight: 1.25;
-$line-height-normal: 1.5;
-$line-height-relaxed: 1.75;
-
-// City marker colors (modern)
-$city-color-major: $danger;
-$city-color-large: $warning;
-$city-color-medium: $accent;
-$city-color-small: $success;
-$city-label-color: $text-primary;
-$city-label-background: $bg-overlay;
+// Button colors
+$button-background: #4a90e2;
+$button-text: white;
 
 // General UI colors
+$white: #ffffff;
 $black: #000000;
 $transparent: transparent;

@@ -108,70 +108,34 @@
   }
 
   &__province {
-    fill: $province-default;
-    stroke: $province-border;
+    fill: $province-fill;
+    fill-opacity: 0.7;
+    stroke: $province-stroke;
     stroke-width: 1;
     cursor: pointer;
-    transition: all $transition-base;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
+    transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
 
     &:hover,
     &:focus {
-      fill: $province-hover;
+      fill-opacity: 0.9;
       stroke-width: 2;
       outline: none;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
-      transform-origin: center;
-      animation: provinceHover 0.3s ease-out;
     }
 
     &:focus {
-      stroke: $primary;
+      stroke: $province-focus-stroke;
       stroke-width: 3;
-      outline: 2px solid rgba($primary, 0.3);
-      outline-offset: 2px;
     }
 
     &--selected {
-      fill: $province-selected;
+      fill-opacity: 0.9;
       stroke-width: 2;
-      stroke: $accent;
-      filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.2));
-      animation: provinceSelect 0.4s ease-out;
+      stroke: $province-selected-stroke;
       
       &:hover {
-        opacity: 0.9;
+        fill-opacity: 1;
         stroke-width: 3;
-        filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.25));
       }
-    }
-  }
-
-  // Province animations
-  @keyframes provinceHover {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.02);
-    }
-    100% {
-      transform: scale(1.01);
-    }
-  }
-
-  @keyframes provinceSelect {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 0.8;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
     }
   }
 
