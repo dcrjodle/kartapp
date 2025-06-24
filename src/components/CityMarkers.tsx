@@ -4,7 +4,7 @@
  * Renders city markers on the map using latitude/longitude coordinates
  */
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { projectToSVG, type Bounds, type MapDimensions } from '../utils/mapProjection';
 import { SwedishCity, getCitySizeCategory } from '../utils/cityDataProcessing';
 import { type ViewBox } from '../utils/mapInteractions';
@@ -21,7 +21,7 @@ interface CityMarkersProps {
   viewBox: ViewBox;
 }
 
-const CityMarkers: React.FC<CityMarkersProps> = ({
+const CityMarkers: React.FC<CityMarkersProps> = memo(({
   cities,
   bounds,
   mapDimensions,
@@ -34,8 +34,8 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
   
   if (!showCities) return null;
 
-  // Only show cities when a province is selected
-  const getVisibleCities = () => {
+  // Memoize visible cities calculation
+  const visibleCities = useMemo(() => {
     if (!selectedProvince) {
       return []; // No cities shown when no province is selected
     }
@@ -46,9 +46,7 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
       (city.admin_name.toLowerCase().includes(selectedProvince.name.toLowerCase()) ||
        city.name.toLowerCase().includes(selectedProvince.name.toLowerCase()))
     );
-  };
-
-  const visibleCities = getVisibleCities();
+  }, [cities, selectedProvince]);
 
   return (
     <g role="group" aria-label={t('cities.population')}>
@@ -123,6 +121,8 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
       })}
     </g>
   );
-};
+});
+
+CityMarkers.displayName = 'CityMarkers';
 
 export default CityMarkers;

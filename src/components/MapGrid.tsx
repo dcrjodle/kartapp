@@ -4,7 +4,7 @@
  * Renders the background grid and coordinate lines for the map
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { type MapDimensions } from '../utils/mapProjection';
 
 interface GridLine {
@@ -21,7 +21,7 @@ interface MapGridProps {
   parallels: GridLine[];
 }
 
-const MapGrid: React.FC<MapGridProps> = ({
+const MapGrid: React.FC<MapGridProps> = memo(({
   mapDimensions,
   meridians,
   parallels,
@@ -78,6 +78,8 @@ const MapGrid: React.FC<MapGridProps> = ({
       </g>
     </>
   );
-};
+});
+
+MapGrid.displayName = 'MapGrid';
 
 export default MapGrid;

@@ -4,7 +4,7 @@
  * Displays map information and control buttons
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { type Provinces, type Bounds } from '../utils/mapProjection';
 import { type ViewBox } from '../utils/mapInteractions';
 import { useTranslations } from '../hooks/useTranslations';
@@ -22,7 +22,7 @@ interface MapControlsProps {
   onZoomOut?: () => void;
 }
 
-const MapControls: React.FC<MapControlsProps> = ({
+const MapControls: React.FC<MapControlsProps> = memo(({
   zoom,
   selectedProvince,
   showOnlySelected,
@@ -123,6 +123,8 @@ const MapControls: React.FC<MapControlsProps> = ({
       </div>
     </div>
   );
-};
+});
+
+MapControls.displayName = 'MapControls';
 
 export default MapControls;

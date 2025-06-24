@@ -4,7 +4,7 @@
  * Renders the interactive province polygons on the map
  */
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { type Provinces } from '../utils/mapProjection';
 import { useTranslations } from '../hooks/useTranslations';
 
@@ -16,7 +16,7 @@ interface MapProvincesProps {
   onProvinceClick: (province: Provinces, index: number) => void;
 }
 
-const MapProvinces: React.FC<MapProvincesProps> = ({
+const MapProvinces: React.FC<MapProvincesProps> = memo(({
   provinces,
   provincePaths,
   selectedProvince,
@@ -24,9 +24,11 @@ const MapProvinces: React.FC<MapProvincesProps> = ({
   onProvinceClick,
 }) => {
   const { t } = useTranslations();
-  const displayProvinces = showOnlySelected && selectedProvince
-    ? [selectedProvince]
-    : provinces;
+  
+  const displayProvinces = useMemo(() => 
+    showOnlySelected && selectedProvince ? [selectedProvince] : provinces,
+    [showOnlySelected, selectedProvince, provinces]
+  );
 
   return (
     <g role="group" aria-label={t('map.provinces')}>
@@ -67,6 +69,8 @@ const MapProvinces: React.FC<MapProvincesProps> = ({
       })}
     </g>
   );
-};
+});
+
+MapProvinces.displayName = 'MapProvinces';
 
 export default MapProvinces;

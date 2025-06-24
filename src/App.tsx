@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import CustomMap from "./components/CustomMap";
-import MovingClouds from "./components/MovingClouds";
 import { provincesData } from "./data/sweden_provinces";
 import { type SwedishCity, processCityData, filterCitiesByPopulation } from "./utils/cityDataProcessing";
 import swedishCitiesData from "./data/swedish-cities.json";
+
+// Lazy load non-critical components
+const MovingClouds = lazy(() => import("./components/MovingClouds"));
 
 const App: React.FC = () => {
   const [zoom, setZoom] = useState(1);
@@ -19,7 +21,9 @@ const App: React.FC = () => {
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <MovingClouds zoom={zoom} selectedProvince={selectedProvince} />
+      <Suspense fallback={null}>
+        <MovingClouds zoom={zoom} selectedProvince={selectedProvince} />
+      </Suspense>
       <CustomMap 
         provinces={provincesData}
         cities={cities}

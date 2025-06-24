@@ -7,7 +7,7 @@
  * @author Generated with Claude Code
  */
 
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, lazy, Suspense } from "react";
 import { type Provinces } from "../utils/mapProjection";
 import { useMapState } from "../hooks/useMapState";
 import { useMapInteractions } from "../hooks/useMapInteractions";
@@ -26,6 +26,9 @@ import MapProvinces from "./MapProvinces";
 import CityMarkers from "./CityMarkers";
 import { type SwedishCity } from "../utils/cityDataProcessing";
 import "./CustomMap.scss";
+
+// Lazy load non-critical components
+const MovingClouds = lazy(() => import("./MovingClouds"));
 
 interface CustomMapProps {
   /** Array of county data with coordinate polygons */
