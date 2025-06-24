@@ -21,7 +21,6 @@ interface UseMapInteractionsProps {
   zoom: number;
   selectedProvince: Provinces | null;
   showOnlySelected: boolean;
-  showCounties: boolean;
   
   // State setters
   setIsDragging: (value: boolean) => void;
@@ -31,7 +30,6 @@ interface UseMapInteractionsProps {
   setViewBox: (value: ViewBox | ((prev: ViewBox) => ViewBox)) => void;
   setSelectedProvince: (value: Provinces | null) => void;
   setShowOnlySelected: (value: boolean) => void;
-  setShowCounties: (value: boolean) => void;
   
   // Configuration
   minZoom: number;
@@ -46,7 +44,6 @@ export const useMapInteractions = ({
   zoom,
   selectedProvince,
   showOnlySelected,
-  showCounties,
   setIsDragging,
   setHasDragged,
   setLastMousePos,
@@ -54,7 +51,6 @@ export const useMapInteractions = ({
   setViewBox,
   setSelectedProvince,
   setShowOnlySelected,
-  setShowCounties,
   minZoom,
   maxZoom,
   initialZoom,
@@ -138,7 +134,7 @@ export const useMapInteractions = ({
   }, [zoom, minZoom, maxZoom, showOnlySelected, selectedProvince, setZoom, setViewBox]);
 
   /**
-   * Handle province click - zoom to province and show counties
+   * Handle province click - zoom to province
    */
   const handleProvinceClick = useCallback((province: Provinces, _index: number) => {
     // Don't handle click if we just finished dragging
@@ -146,13 +142,12 @@ export const useMapInteractions = ({
     
     setSelectedProvince(province);
     setShowOnlySelected(true);
-    setShowCounties(true);
     
     // Reset zoom when switching to single province view
     setZoom(initialZoom);
     
     // The bounds and viewBox will automatically update due to the useMemo dependencies
-  }, [hasDragged, initialZoom, setSelectedProvince, setShowOnlySelected, setShowCounties, setZoom]);
+  }, [hasDragged, initialZoom, setSelectedProvince, setShowOnlySelected, setZoom]);
 
   return {
     svgRef,

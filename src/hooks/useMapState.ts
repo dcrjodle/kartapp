@@ -17,9 +17,6 @@ export interface MapState {
   // Province selection state
   selectedProvince: Provinces | null;
   showOnlySelected: boolean;
-  
-  // Counties display state
-  showCounties: boolean;
 }
 
 export const useMapState = (initialZoom: number = 1) => {
@@ -33,7 +30,6 @@ export const useMapState = (initialZoom: number = 1) => {
   const [zoom, setZoom] = useState(initialZoom);
   const [selectedProvince, setSelectedProvince] = useState<Provinces | null>(null);
   const [showOnlySelected, setShowOnlySelected] = useState(false);
-  const [showCounties, setShowCounties] = useState(false);
   
   // Initialize viewBox with proper dimensions
   const [viewBox, setViewBox] = useState<ViewBox>({
@@ -47,7 +43,6 @@ export const useMapState = (initialZoom: number = 1) => {
   const resetState = useCallback(() => {
     setSelectedProvince(null);
     setShowOnlySelected(false);
-    setShowCounties(false);
     setZoom(initialZoom);
     setIsDragging(false);
     setHasDragged(false);
@@ -63,7 +58,6 @@ export const useMapState = (initialZoom: number = 1) => {
     viewBox,
     selectedProvince,
     showOnlySelected,
-    showCounties,
     
     // State setters
     setIsDragging,
@@ -73,7 +67,6 @@ export const useMapState = (initialZoom: number = 1) => {
     setViewBox,
     setSelectedProvince,
     setShowOnlySelected,
-    setShowCounties,
     
     // Actions
     resetState,

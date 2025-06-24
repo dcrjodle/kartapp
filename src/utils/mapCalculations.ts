@@ -19,7 +19,6 @@ import {
  */
 export const useMapBounds = (
   provinces: Provinces[],
-  swedenBorderData: Provinces,
   selectedProvince: Provinces | null,
   showOnlySelected: boolean
 ): Bounds => {
@@ -28,10 +27,9 @@ export const useMapBounds = (
       // Calculate bounds for only the selected province
       return calculateGeographicBounds([selectedProvince]);
     }
-    // Include Sweden border in bounds calculation for proper scaling
-    const allFeatures = [...provinces, swedenBorderData];
-    return calculateGeographicBounds(allFeatures);
-  }, [provinces, swedenBorderData, selectedProvince, showOnlySelected]);
+    // Calculate bounds for all provinces
+    return calculateGeographicBounds(provinces);
+  }, [provinces, selectedProvince, showOnlySelected]);
 };
 
 /**
@@ -58,19 +56,6 @@ export const useProvincePaths = (
   );
 };
 
-/**
- * Pre-calculate Sweden border path
- */
-export const useSwedenBorderPath = (
-  swedenBorderData: Provinces,
-  bounds: Bounds,
-  mapDimensions: MapDimensions
-): string => {
-  return useMemo(
-    () => polygonToSVGPath(swedenBorderData.coordinates, bounds, mapDimensions),
-    [swedenBorderData, bounds, mapDimensions]
-  );
-};
 
 /**
  * Generate grid lines (meridians and parallels)
@@ -98,7 +83,6 @@ export const useGridLines = (
  */
 export const createResetViewFunction = (
   provinces: Provinces[],
-  swedenBorderData: Provinces,
   initialZoom: number,
   resetState: () => void,
   setViewBox: (value: any) => void
@@ -108,8 +92,7 @@ export const createResetViewFunction = (
     
     // Force recalculation by setting a timeout to let bounds/mapDimensions update first
     setTimeout(() => {
-      const allFeatures = [...provinces, swedenBorderData];
-      const resetBounds = calculateGeographicBounds(allFeatures);
+      const resetBounds = calculateGeographicBounds(provinces);
       const resetDimensions = calculateMapDimensions(resetBounds);
       
       setViewBox({
