@@ -77,20 +77,6 @@ const MapControls: React.FC<MapControlsProps> = ({
         <h3 className="map-controls__section-title">{t('map.controls')}</h3>
         <div className="map-controls__buttons">
         <div className="map-controls__zoom-buttons">
-          {onZoomIn && (
-            <button
-              onClick={onZoomIn}
-              className="map-controls__zoom-button"
-              type="button"
-              data-testid="zoom-in"
-              aria-label={t('map.zoomIn')}
-              disabled={showOnlySelected && !!selectedProvince}
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </button>
-          )}
           {onZoomOut && (
             <button
               onClick={onZoomOut}
@@ -102,6 +88,20 @@ const MapControls: React.FC<MapControlsProps> = ({
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                 <path d="M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          )}
+          {onZoomIn && (
+            <button
+              onClick={onZoomIn}
+              className="map-controls__zoom-button"
+              type="button"
+              data-testid="zoom-in"
+              aria-label={t('map.zoomIn')}
+              disabled={showOnlySelected && !!selectedProvince}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </button>
           )}
