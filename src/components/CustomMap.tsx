@@ -192,6 +192,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
           zoom={zoom}
           selectedProvince={selectedProvince}
           showCities={true}
+          viewBox={viewBox}
         />
       </svg>
 

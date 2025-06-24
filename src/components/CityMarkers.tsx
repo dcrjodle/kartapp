@@ -7,6 +7,7 @@
 import React from 'react';
 import { projectToSVG, type Bounds, type MapDimensions } from '../utils/mapProjection';
 import { SwedishCity, getCitySizeCategory } from '../utils/cityDataProcessing';
+import { type ViewBox } from '../utils/mapInteractions';
 import './CityMarkers.scss';
 
 interface CityMarkersProps {
@@ -16,6 +17,7 @@ interface CityMarkersProps {
   zoom: number;
   selectedProvince: any;
   showCities?: boolean;
+  viewBox: ViewBox;
 }
 
 const CityMarkers: React.FC<CityMarkersProps> = ({
@@ -25,6 +27,7 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
   zoom,
   selectedProvince,
   showCities = true,
+  viewBox,
 }) => {
   if (!showCities) return null;
 
@@ -58,11 +61,12 @@ const CityMarkers: React.FC<CityMarkersProps> = ({
           major: 15
         };
         
-        // Calculate scale factor based on map dimensions to handle aspect ratio differences
-        // Use the smaller dimension to ensure consistent sizing across all province shapes
-        const baseMapSize = 1000; // Base reference size from mapProjection.ts
-        const currentMapScale = Math.min(mapDimensions.width, mapDimensions.height) / baseMapSize;
-        const scaleFactor = Math.max(currentMapScale * zoom, 0.8); // Minimum scale factor
+        // Calculate scale factor based on viewBox size to handle different province zoom levels
+        // When a province is selected, viewBox becomes much smaller, so elements need to scale up
+        const baseViewBoxSize = Math.max(mapDimensions.width, mapDimensions.height);
+        const currentViewBoxSize = Math.max(viewBox.width, viewBox.height);
+        const viewBoxScale = baseViewBoxSize / currentViewBoxSize;
+        const scaleFactor = Math.max(viewBoxScale * 0.1, 1); // Scale relative to zoom level
         
         const adjustedRadius = baseSizes[sizeCategory] * scaleFactor;
         const adjustedFontSize = 14 * scaleFactor;
