@@ -10,6 +10,7 @@ import { SwedishCity, getCitySizeCategory } from '../utils/cityDataProcessing';
 import { type ViewBox } from '../utils/mapInteractions';
 import { getProvinceByName } from '../data/standardized-provinces';
 import { useTranslations } from '../hooks/useTranslations';
+import { createError } from '../utils/errorHandling';
 import './CityMarkers.scss';
 
 interface CityMarkersProps {
@@ -36,34 +37,81 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
 
   // Memoize visible cities calculation
   const visibleCities = useMemo(() => {
-    if (!selectedProvince) {
-      return []; // No cities shown when no province is selected
-    }
-
-    // Use standardized province matching instead of fragile string matching
-    const standardizedProvince = getProvinceByName(selectedProvince.name);
-    
-    return cities.filter(city => {
-      if (city.population < 30000) return false; // Only cities with 30k+ population
-      
-      // Try multiple matching strategies
-      const cityAdminLower = city.admin_name.toLowerCase();
-      const provinceName = selectedProvince.name.toLowerCase();
-      
-      // Primary match: exact name match
-      if (cityAdminLower === provinceName) return true;
-      
-      // Secondary match: check aliases if standardized province exists
-      if (standardizedProvince?.aliases) {
-        return standardizedProvince.aliases.some(alias => 
-          cityAdminLower === alias.toLowerCase()
-        );
+    try {
+      if (!selectedProvince) {
+        return []; // No cities shown when no province is selected
       }
+
+      if (!cities || cities.length === 0) {
+        console.warn('⚠️ No cities data available for filtering');
+        return [];
+      }
+
+      // Use standardized province matching instead of fragile string matching
+      const standardizedProvince = getProvinceByName(selectedProvince.name);
       
-      // Fallback: partial name matching (less reliable)
-      return cityAdminLower.includes(provinceName) || 
-             city.name.toLowerCase().includes(provinceName);
-    });
+      const filteredCities = cities.filter(city => {
+        try {
+          if (!city || typeof city.population !== 'number') {
+            console.warn('⚠️ Invalid city data:', city);
+            return false;
+          }
+
+          if (city.population < 30000) return false; // Only cities with 30k+ population
+          
+          // Try multiple matching strategies
+          const cityAdminLower = city.admin_name?.toLowerCase() || '';
+          const provinceName = selectedProvince.name?.toLowerCase() || '';
+          
+          if (!cityAdminLower || !provinceName) {
+            console.warn('⚠️ Missing admin_name or province name:', { city: city.name, cityAdmin: city.admin_name, provinceName: selectedProvince.name });
+            return false;
+          }
+          
+          // Primary match: exact name match
+          if (cityAdminLower === provinceName) return true;
+          
+          // Secondary match: check aliases if standardized province exists
+          if (standardizedProvince?.aliases) {
+            return standardizedProvince.aliases.some(alias => 
+              cityAdminLower === alias.toLowerCase()
+            );
+          }
+          
+          // Fallback: partial name matching (less reliable)
+          return cityAdminLower.includes(provinceName) || 
+                 city.name.toLowerCase().includes(provinceName);
+        } catch (error) {
+          createError(
+            'Error filtering individual city',
+            {
+              source: 'CityMarkers',
+              function: 'visibleCities.filter',
+              data: { city, selectedProvince: selectedProvince.name },
+            },
+            'low'
+          );
+          return false;
+        }
+      });
+
+      console.log(`🏙️ Filtered cities for ${selectedProvince.name}: ${filteredCities.length} cities`);
+      return filteredCities;
+    } catch (error) {
+      createError(
+        'Error calculating visible cities',
+        {
+          source: 'CityMarkers',
+          function: 'visibleCities',
+          data: { 
+            citiesCount: cities?.length || 0, 
+            selectedProvince: selectedProvince?.name || 'unknown' 
+          },
+        },
+        'medium'
+      );
+      return [];
+    }
   }, [cities, selectedProvince]);
 
   return (

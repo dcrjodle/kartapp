@@ -4,6 +4,7 @@
 
 import { DataImport, DataSeries, DataPoint } from '../types/visualization';
 import { getProvinceById, getProvinceByName, getProvinceByIsoCode, getProvincesByPostalCode } from '../data/standardized-provinces';
+import { createError, withErrorHandling } from '../utils/errorHandling';
 
 export class DataIngestionError extends Error {
   constructor(message: string, public cause?: Error) {
@@ -16,22 +17,70 @@ export class DataIngestionError extends Error {
  * Parse CSV data into structured format
  */
 export const parseCSVData = (csvContent: string): any[] => {
-  const lines = csvContent.trim().split('\n');
-  if (lines.length < 2) {
-    throw new DataIngestionError('CSV must contain at least a header row and one data row');
-  }
+  try {
+    const lines = csvContent.trim().split('\n');
+    if (lines.length < 2) {
+      throw createError(
+        'CSV must contain at least a header row and one data row',
+        {
+          source: 'dataIngestion',
+          function: 'parseCSVData',
+          data: { lineCount: lines.length, contentLength: csvContent.length },
+        },
+        'medium'
+      );
+    }
 
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-  const data = lines.slice(1).map(line => {
-    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-    const row: any = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index] || '';
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    if (headers.length === 0 || headers[0] === '') {
+      throw createError(
+        'CSV headers are missing or invalid',
+        {
+          source: 'dataIngestion',
+          function: 'parseCSVData',
+          data: { headers, firstLine: lines[0] },
+        },
+        'medium'
+      );
+    }
+
+    const data = lines.slice(1).map((line, index) => {
+      try {
+        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+        const row: any = {};
+        headers.forEach((header, headerIndex) => {
+          row[header] = values[headerIndex] || '';
+        });
+        return row;
+      } catch (error) {
+        throw createError(
+          `Failed to parse CSV row ${index + 2}`,
+          {
+            source: 'dataIngestion',
+            function: 'parseCSVData',
+            data: { rowIndex: index + 2, line, headers },
+          },
+          'medium',
+        );
+      }
     });
-    return row;
-  });
 
-  return data;
+    console.log(`✅ Successfully parsed CSV: ${headers.length} columns, ${data.length} rows`);
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AppError') {
+      throw error; // Re-throw AppErrors
+    }
+    throw createError(
+      `CSV parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      {
+        source: 'dataIngestion',
+        function: 'parseCSVData',
+        data: { contentPreview: csvContent.substring(0, 200) },
+      },
+      'high'
+    );
+  }
 };
 
 /**
@@ -139,37 +188,75 @@ export const processDataImport = (dataImport: DataImport, seriesName: string): D
  * Process multiple data formats
  */
 export const ingestData = async (file: File, mappings: DataImport['mappings'], identifierType: DataImport['identifierType']): Promise<DataSeries> => {
-  const fileName = file.name;
-  let data: any[];
-  let source: DataImport['source'];
+  return withErrorHandling(
+    async () => {
+      const fileName = file.name;
+      let data: any[];
+      let source: DataImport['source'];
 
-  try {
-    if (fileName.endsWith('.csv')) {
-      const content = await file.text();
-      data = parseCSVData(content);
-      source = 'csv';
-    } else if (fileName.endsWith('.json')) {
-      const content = await file.text();
-      data = JSON.parse(content);
-      source = 'json';
-    } else {
-      throw new DataIngestionError(`Unsupported file format: ${fileName}`);
+      console.log(`📁 Processing file: ${fileName} (${file.size} bytes)`);
+
+      if (fileName.endsWith('.csv')) {
+        const content = await file.text();
+        data = parseCSVData(content);
+        source = 'csv';
+      } else if (fileName.endsWith('.json')) {
+        const content = await file.text();
+        try {
+          data = JSON.parse(content);
+          if (!Array.isArray(data)) {
+            throw createError(
+              'JSON file must contain an array of objects',
+              {
+                source: 'dataIngestion',
+                function: 'ingestData',
+                data: { fileName, dataType: typeof data },
+              },
+              'medium'
+            );
+          }
+        } catch (jsonError) {
+          throw createError(
+            'Invalid JSON format in uploaded file',
+            {
+              source: 'dataIngestion',
+              function: 'ingestData',
+              data: { fileName, jsonError: jsonError instanceof Error ? jsonError.message : 'Unknown JSON error' },
+            },
+            'medium'
+          );
+        }
+        source = 'json';
+      } else {
+        throw createError(
+          `Unsupported file format: ${fileName}`,
+          {
+            source: 'dataIngestion',
+            function: 'ingestData',
+            data: { fileName, fileSize: file.size, supportedFormats: ['.csv', '.json'] },
+          },
+          'medium'
+        );
+      }
+
+      const dataImport: DataImport = {
+        source,
+        data,
+        mappings,
+        identifierType,
+      };
+
+      const result = processDataImport(dataImport, fileName);
+      console.log(`✅ Successfully processed ${fileName}: ${result.data.length} data points`);
+      return result;
+    },
+    {
+      source: 'dataIngestion',
+      function: 'ingestData',
+      userAction: `upload file: ${file.name}`,
+      data: { fileName: file.name, fileSize: file.size, mappings, identifierType },
     }
-
-    const dataImport: DataImport = {
-      source,
-      data,
-      mappings,
-      identifierType,
-    };
-
-    return processDataImport(dataImport, fileName);
-  } catch (error) {
-    if (error instanceof DataIngestionError) {
-      throw error;
-    }
-    throw new DataIngestionError(`Failed to process file: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+  ) as Promise<DataSeries>;
 };
 
 /**
