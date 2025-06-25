@@ -24,13 +24,14 @@ This document outlines the technical architecture and implementation strategy fo
 
 ## Backend Architecture
 
-### Technology Choice: Node.js + Express
+### Technology Choice: Node.js + Express + LLM Integration
 **Rationale**: 
 - JavaScript ecosystem alignment with frontend
-- Rich data processing libraries (lodash, d3-scale, moment)
-- Easy JSON handling and validation
+- **LLM-powered data interpretation** with flexible API provider support
+- **Prompt engineering** replaces manual parsing logic
+- Easy JSON handling and LLM response processing
 - Future TypeScript migration path
-- Excellent LLM API integration libraries
+- Excellent AI/ML API integration libraries
 
 ### Core Backend Structure
 
@@ -38,14 +39,14 @@ This document outlines the technical architecture and implementation strategy fo
 backend/
 ├── src/
 │   ├── controllers/
-│   │   ├── dataController.js      # Main data processing endpoints
-│   │   ├── promptController.js    # Future LLM prompt handling
+│   │   ├── dataController.js      # LLM-powered data processing endpoints
+│   │   ├── llmController.js       # LLM prompt engineering and responses
 │   │   └── healthController.js    # Health checks
 │   ├── services/
-│   │   ├── dataProcessor.js       # Core data transformation logic
-│   │   ├── geoMatcher.js         # Province/coordinate matching
-│   │   ├── rankingEngine.js      # Ranking and scoring algorithms
-│   │   └── validationService.js  # Data validation and cleaning
+│   │   ├── llmService.js          # Generic LLM API integration layer
+│   │   ├── promptEngine.js        # Prompt templates and engineering
+│   │   ├── geoMatcher.js         # LLM-assisted geographic matching
+│   │   └── responseParser.js     # Parse and validate LLM responses
 │   ├── utils/
 │   │   ├── constants.js          # Swedish provinces, cities data
 │   │   ├── colorScales.js        # Color interpolation utilities
