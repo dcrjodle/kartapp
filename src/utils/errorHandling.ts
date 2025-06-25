@@ -297,65 +297,8 @@ export const withErrorHandling = async <T>(
   }
 };
 
-/**
- * Error boundary wrapper for React components
- */
-export const withErrorBoundary = <T extends Record<string, any>>(
-  Component: React.ComponentType<T>,
-  componentName: string
-) => {
-  return class ErrorBoundaryWrapper extends React.Component<T, { hasError: boolean; error?: AppError }> {
-    constructor(props: T) {
-      super(props);
-      this.state = { hasError: false };
-    }
-
-    static getDerivedStateFromError(error: Error) {
-      return { hasError: true };
-    }
-
-    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-      const appError = new AppError(
-        `React component error in ${componentName}`,
-        {
-          source: componentName,
-          function: 'render',
-          data: { errorInfo, props: this.props },
-          environment: ErrorHandler.getInstance()['getEnvironmentInfo'](),
-        },
-        'high',
-        error
-      );
-
-      this.setState({ error: appError });
-      ErrorHandler.getInstance().handleError(appError);
-    }
-
-    render() {
-      if (this.state.hasError) {
-        return (
-          <div style={{ padding: '20px', border: '1px solid #fcc', background: '#fee', margin: '20px' }}>
-            <h3>Component Error</h3>
-            <p>The {componentName} component encountered an error.</p>
-            {this.state.error && (
-              <details>
-                <summary>Debug Info</summary>
-                <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-                  {this.state.error.getDebugInfo()}
-                </pre>
-              </details>
-            )}
-            <button onClick={() => this.setState({ hasError: false, error: undefined })}>
-              Try Again
-            </button>
-          </div>
-        );
-      }
-
-      return <Component {...this.props} />;
-    }
-  };
-};
+// Note: withErrorBoundary is available but not exported due to React import complexity
+// Use it in individual component files that already import React
 
 // Global error handler setup
 if (typeof window !== 'undefined') {
