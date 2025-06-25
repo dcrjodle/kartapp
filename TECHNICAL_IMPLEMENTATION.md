@@ -1,4 +1,4 @@
-# Swedish Statistics Visualization Platform - Technical Implementation Guide
+# Swedish Statistics Visualization Platform - Technical Implementation Guide - Part 1
 
 ## Overview
 

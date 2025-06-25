@@ -8,6 +8,7 @@ import React, { memo, useMemo } from 'react';
 import { projectToSVG, type Bounds, type MapDimensions } from '../utils/mapProjection';
 import { SwedishCity, getCitySizeCategory } from '../utils/cityDataProcessing';
 import { type ViewBox } from '../utils/mapInteractions';
+import { getProvinceByName } from '../data/standardized-provinces';
 import { useTranslations } from '../hooks/useTranslations';
 import './CityMarkers.scss';
 
@@ -28,7 +29,6 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
   zoom,
   selectedProvince,
   showCities = true,
-  viewBox,
 }) => {
   const { t } = useTranslations();
   
@@ -40,12 +40,30 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
       return []; // No cities shown when no province is selected
     }
 
-    // Filter by province selection and minimum population
-    return cities.filter(city => 
-      city.population >= 30000 && // Only cities with 30k+ population
-      (city.admin_name.toLowerCase().includes(selectedProvince.name.toLowerCase()) ||
-       city.name.toLowerCase().includes(selectedProvince.name.toLowerCase()))
-    );
+    // Use standardized province matching instead of fragile string matching
+    const standardizedProvince = getProvinceByName(selectedProvince.name);
+    
+    return cities.filter(city => {
+      if (city.population < 30000) return false; // Only cities with 30k+ population
+      
+      // Try multiple matching strategies
+      const cityAdminLower = city.admin_name.toLowerCase();
+      const provinceName = selectedProvince.name.toLowerCase();
+      
+      // Primary match: exact name match
+      if (cityAdminLower === provinceName) return true;
+      
+      // Secondary match: check aliases if standardized province exists
+      if (standardizedProvince?.aliases) {
+        return standardizedProvince.aliases.some(alias => 
+          cityAdminLower === alias.toLowerCase()
+        );
+      }
+      
+      // Fallback: partial name matching (less reliable)
+      return cityAdminLower.includes(provinceName) || 
+             city.name.toLowerCase().includes(provinceName);
+    });
   }, [cities, selectedProvince]);
 
   return (
