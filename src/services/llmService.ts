@@ -1,17 +1,16 @@
 /**
- * Generic LLM Service for data interpretation and processing
- * Flexible design to support any LLM API provider
+ * LLM Service for data interpretation and processing
+ * Using Google Generative AI TypeScript SDK
  */
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createError, withErrorHandling } from '../utils/errorHandling';
 import { DataSeries } from '../types/visualization';
 
 export interface LLMConfig {
-  apiEndpoint: string;
   apiKey: string;
   model?: string;
   maxTokens?: number;
-  headers?: Record<string, string>;
 }
 
 export interface LLMDataRequest {
@@ -30,13 +29,15 @@ export interface LLMResponse {
 }
 
 /**
- * Generic LLM Service class for data processing
+ * Google Generative AI Service for data processing
  */
 export class LLMService {
   private config: LLMConfig;
+  private genAI: GoogleGenerativeAI;
 
   constructor(config: LLMConfig) {
     this.config = config;
+    this.genAI = new GoogleGenerativeAI(config.apiKey);
   }
 
   /**
@@ -55,7 +56,7 @@ export class LLMService {
         function: 'processData',
         userAction: `process data with LLM: ${request.fileName}`,
         data: { 
-          apiEndpoint: this.config.apiEndpoint,
+          model: this.config.model || 'gemini-pro',
           fileType: request.fileType,
           contentLength: request.rawContent.length 
         },
@@ -78,7 +79,7 @@ export class LLMService {
         source: 'LLMService',
         function: 'getDataSuggestions',
         userAction: `get data suggestions: ${request.fileName}`,
-        data: { apiEndpoint: this.config.apiEndpoint },
+        data: { model: this.config.model || 'gemini-pro' },
       }
     ) as Promise<string[]>;
   }
@@ -154,45 +155,35 @@ Return suggestions as JSON array:
   }
 
   /**
-   * Call generic LLM API
+   * Call Google Generative AI
    */
   private async callLLM(prompt: string): Promise<string> {
     try {
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        ...this.config.headers,
-      };
-
-      const requestBody = {
-        prompt: prompt,
-        max_tokens: this.config.maxTokens || 4096,
-        temperature: 0.1, // Low temperature for consistent data parsing
-        model: this.config.model,
-      };
-
-      const response = await fetch(this.config.apiEndpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestBody),
+      const model = this.genAI.getGenerativeModel({ 
+        model: this.config.model || 'gemini-pro',
+        generationConfig: {
+          maxOutputTokens: this.config.maxTokens || 4096,
+          temperature: 0.1, // Low temperature for consistent data parsing
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`LLM API error: ${response.status} ${response.statusText}`);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      if (!text) {
+        throw new Error('Empty response from Gemini');
       }
 
-      const data = await response.json();
-      
-      // Generic response parsing - can be customized for different providers
-      return this.extractTextFromResponse(data);
+      return text;
     } catch (error) {
       throw createError(
-        `LLM API call failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Gemini API call failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         {
           source: 'LLMService',
           function: 'callLLM',
           data: { 
-            endpoint: this.config.apiEndpoint,
+            model: this.config.model || 'gemini-pro',
             promptLength: prompt.length 
           },
         },
@@ -201,30 +192,7 @@ Return suggestions as JSON array:
     }
   }
 
-  /**
-   * Extract text from LLM response - override this method for specific providers
-   */
-  private extractTextFromResponse(data: any): string {
-    // Generic extraction - handles common response formats
-    if (typeof data === 'string') return data;
-    if (data.text) return data.text;
-    if (data.response) return data.response;
-    if (data.choices?.[0]?.text) return data.choices[0].text;
-    if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    if (data.candidates?.[0]?.content?.parts?.[0]?.text) return data.candidates[0].content.parts[0].text;
-    if (data.generated_text) return data.generated_text;
-    if (data[0]?.generated_text) return data[0].generated_text;
-    
-    throw createError(
-      'Could not extract text from LLM response',
-      {
-        source: 'LLMService',
-        function: 'extractTextFromResponse',
-        data: { responseKeys: Object.keys(data) },
-      },
-      'high'
-    );
-  }
+  // Removed - not needed with Google Generative AI SDK
 
   /**
    * Parse LLM response for data processing
@@ -297,34 +265,23 @@ Return suggestions as JSON array:
  * Create LLM service instance from environment configuration
  */
 export const createLLMService = (): LLMService => {
-  const apiEndpoint = process.env.REACT_APP_LLM_API_ENDPOINT || '';
   const apiKey = process.env.REACT_APP_LLM_API_KEY || '';
   
-  if (!apiEndpoint || !apiKey) {
+  if (!apiKey) {
     throw createError(
-      'LLM configuration not found in environment variables',
+      'Gemini API key not found in environment variables',
       {
         source: 'LLMService',
         function: 'createLLMService',
-        data: { 
-          hasEndpoint: !!apiEndpoint, 
-          hasApiKey: !!apiKey 
-        },
+        data: { hasApiKey: !!apiKey },
       },
       'critical'
     );
   }
 
-  // Parse additional headers from environment if provided
-  const additionalHeaders = process.env.REACT_APP_LLM_HEADERS 
-    ? JSON.parse(process.env.REACT_APP_LLM_HEADERS)
-    : {};
-
   return new LLMService({
-    apiEndpoint,
     apiKey,
-    model: process.env.REACT_APP_LLM_MODEL,
+    model: process.env.REACT_APP_LLM_MODEL || 'gemini-pro',
     maxTokens: parseInt(process.env.REACT_APP_LLM_MAX_TOKENS || '4096'),
-    headers: additionalHeaders,
   });
 };

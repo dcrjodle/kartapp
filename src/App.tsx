@@ -7,6 +7,7 @@ import './utils/errorHandling'; // Initialize global error handling
 
 // Lazy load non-critical components
 const MovingClouds = lazy(() => import("./components/MovingClouds"));
+const LLMTest = lazy(() => import("./components/LLMTest"));
 
 const App: React.FC = () => {
   const [zoom, setZoom] = useState(1);
@@ -24,6 +25,7 @@ const App: React.FC = () => {
     <div style={{ width: "100vw", height: "100vh" }}>
       <Suspense fallback={null}>
         <MovingClouds zoom={zoom} selectedProvince={selectedProvince} />
+        <LLMTest />
       </Suspense>
       <CustomMap 
         provinces={provincesData}
