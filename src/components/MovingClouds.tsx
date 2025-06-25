@@ -3,7 +3,7 @@ import './MovingClouds.scss';
 
 interface MovingCloudsProps {
   zoom: number;
-  selectedProvince: any;
+  selectedProvince: any; // TODO: Type this properly with Province interface
 }
 
 const MovingClouds: React.FC<MovingCloudsProps> = ({ zoom, selectedProvince }) => {

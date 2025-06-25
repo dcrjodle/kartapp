@@ -18,7 +18,7 @@ interface CityMarkersProps {
   bounds: Bounds;
   mapDimensions: MapDimensions;
   zoom: number;
-  selectedProvince: any;
+  selectedProvince: any; // TODO: Type this properly with Province interface
   showCities?: boolean;
   viewBox: ViewBox;
 }

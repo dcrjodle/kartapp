@@ -14,6 +14,7 @@ export interface MapDimensions {
   height: number;
 }
 
+// Legacy interface - use Province from types/geographic.ts instead
 export interface Provinces {
   coordinates: number[][] | number[][][][];
   name?: string;

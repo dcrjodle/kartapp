@@ -5,7 +5,7 @@
  */
 
 import React, { memo, useMemo } from 'react';
-import { type Provinces } from '../utils/mapProjection';
+import { type Provinces } from '../utils/mapProjection'; // TODO: Migrate to Province from types/geographic.ts
 import { useTranslations } from '../hooks/useTranslations';
 
 interface MapProvincesProps {

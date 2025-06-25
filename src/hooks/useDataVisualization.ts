@@ -33,7 +33,7 @@ export const useDataVisualization = () => {
     error: null,
   });
 
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   /**
    * Load a new data series

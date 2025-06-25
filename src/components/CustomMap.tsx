@@ -8,7 +8,7 @@
  */
 
 import React, { useEffect, useCallback, lazy, Suspense } from "react";
-import { type Provinces } from "../utils/mapProjection";
+import { type Provinces } from "../utils/mapProjection"; // TODO: Migrate to Province from types/geographic.ts
 import { useMapState } from "../hooks/useMapState";
 import { useMapInteractions } from "../hooks/useMapInteractions";
 import { useMapKeyboard } from "../hooks/useMapKeyboard";

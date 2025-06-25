@@ -27,7 +27,7 @@ const MapGrid: React.FC<MapGridProps> = memo(({
   parallels,
 }) => {
   return (
-    <>
+    <g data-testid="map-grid">
       {/* Grid pattern definition */}
       <defs>
         <pattern
@@ -76,7 +76,7 @@ const MapGrid: React.FC<MapGridProps> = memo(({
           />
         ))}
       </g>
-    </>
+    </g>
   );
 });
 
