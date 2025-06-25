@@ -16,29 +16,24 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Git Workflow
 
-### Branch: custom (current working branch)
-
-### Main branch: main
-
-### Commit Convention
-
-Use conventional commit format:
-
-- `feat:` - New features
-- `fix:` - Bug fixes
-- `refactor:` - Code refactoring
-- `style:` - Styling changes
-
-### Commit Requirements
-
-- **Commit each change** - Always commit when making changes to the codebase
-- **Frequent commits** - Don't batch multiple unrelated changes into one commit
-- **Descriptive messages** - Use clear, descriptive commit messages that explain what was changed
-- **One logical change per commit** - Each commit should represent one logical change or fix
+- Use conventional commits: `feat:`, `fix:`, `refactor:`, `style:`
+- Main branch: **main**
+- Commit frequently with clear, descriptive messages
 
 ## Project Overview
 
-React TypeScript application displaying Swedish municipalities on an interactive SVG map using custom Mercator projection. No external mapping libraries used.
+**Swedish Statistics Visualization Platform** - Interactive data visualization application that displays statistical information overlaid on Swedish provinces and municipalities. The platform transforms complex statistical data into intuitive visual representations for government analysis, research, business intelligence, and education.
+
+### Core Purpose
+- Visualize crime rates, demographics, economic indicators by region
+- Display survey results, market data, and comparative analysis
+- Support multiple visualization types: heat maps, event markers, choropleth maps
+- Import data from CSV, JSON, Excel formats with geographic matching
+- Provide interactive filtering, legends, and data export capabilities
+
+### Implementation Status
+- ✅ Foundation: Interactive SVG map with pan/zoom, province selection, city markers
+- 🎯 Next: Data management system, visualization engine, control panels, advanced analytics
 
 ### Technology Stack
 
@@ -51,103 +46,50 @@ React TypeScript application displaying Swedish municipalities on an interactive
 
 ```
 src/
-├── components/CustomMap.tsx    # Main map component
-├── hooks/                      # Custom React hooks
+├── components/
+│   ├── CustomMap.tsx          # Main map component
+│   ├── DataUpload.tsx         # Data import interface (planned)
+│   ├── VisualizationControls.tsx # Visualization toggles (planned)
+│   └── Legend.tsx             # Dynamic legends (planned)
+├── hooks/
 │   ├── useMapState.ts         # State management
 │   ├── useMapInteractions.ts  # Mouse/wheel events
-│   ├── useMapKeyboard.ts      # Keyboard events
+│   ├── useDataVisualization.ts # Data visualization logic (planned)
 │   └── useTranslations.ts     # Internationalization
 ├── utils/
 │   ├── mapProjection.ts       # Geographic calculations
-│   ├── mapInteractions.ts     # Interaction utilities
-│   ├── mapCalculations.ts     # Calculation hooks
+│   ├── dataProcessing.ts      # Data parsing and validation (planned)
+│   ├── colorScales.ts         # Color interpolation (planned)
 │   └── i18n.ts               # Translation utilities
-├── content/
-│   └── translations.ts       # All text content
-├── styles/
-│   └── _colors.scss          # Color variables
+├── content/translations.ts    # All text content
+├── styles/_colors.scss        # Color variables
 └── data/sweden.ts             # GeoJSON data
 ```
 
-### Performance Notes
+### Technology Stack
 
-- All calculations memoized with useMemo/useCallback
-- SVG paths pre-calculated
-- Non-passive wheel events for zoom control
+- React 19 + TypeScript
+- Custom SVG rendering with Mercator projection
+- SASS for styling
+- No external mapping libraries
 
 ## Coding Rules
 
-### Component Structure
+### Component Guidelines
 
-- **Keep components clean and focused** - Components should only handle rendering and basic prop management
-- **Extract logic into custom hooks** - All state management, effects, and complex logic must go into custom hooks in `src/hooks/`
-- **Use utility functions** - All calculations, transformations, and pure functions must go into `src/utils/`
-- **Maximum component size** - Components should not exceed 100-150 lines. If larger, extract logic into hooks/utils
-- **Break down complex rendering** - Don't render too much in a single component block. Extract rendered elements into separate components for better maintainability and reusability
-- **Component composition** - Prefer composition over large monolithic components. Create smaller, focused components that can be combined
+- **Clean & focused** - Components handle rendering only, extract logic to hooks/utils
+- **Size limit** - Max 100-150 lines, break down complex rendering
+- **Accessibility** - Keyboard accessible, ARIA labels, semantic HTML, .sr-only for screen readers
 
-### Accessibility Guidelines
+### Code Organization
 
-- **All interactive elements must be keyboard accessible** - Use proper tabIndex, onKeyDown handlers for Enter/Space
-- **Provide ARIA labels and roles** - Use role, aria-label, aria-describedby for screen readers
-- **Include screen reader instructions** - Add hidden instructions using .sr-only class
-- **Focus management** - Ensure proper focus styling and logical tab order
-- **Semantic HTML** - Use appropriate HTML elements and ARIA roles
+- **Hooks**: Single responsibility, reusable, clear naming (`useMapState`, `useDataVisualization`)
+- **Utils**: Pure functions with JSDoc comments, easily testable
+- **Styling**: All colors in `src/styles/_colors.scss`, import with `@use "../styles/colors" as *;`
+- **Content**: All text in `src/content/translations.ts`, access via `useTranslations()` hook
+- **Data**: Only data files and types in `src/data/`, no utility functions
+- **Naming**: Descriptive file names, consistent patterns within folders
 
-### Hook Guidelines
-
-- **Single responsibility** - Each hook should handle one specific concern (state, interactions, calculations, etc.)
-- **Reusable** - Design hooks to be potentially reusable across components
-- **Clear naming** - Use descriptive names like `useMapInteractions`, `useMapState`
-
-### Utility Guidelines
-
-- **Pure functions** - Utility functions should be pure (no side effects)
-- **Well documented** - Include JSDoc comments for complex calculations
-- **Testable** - Structure utilities to be easily unit tested
-
-### Styling Guidelines
-
-- **Centralized colors** - All color variables must be defined in `src/styles/_colors.scss`
-- **Import color variables** - Use `@use "../styles/colors" as *;` in component SCSS files
-- **No hardcoded colors** - Never use color values directly in component styles
-
-### Content Management Guidelines
-
-- **Content folder** - All text content must be stored in `src/content/` folder
-- **Translation files** - Text content goes in `src/content/translations.ts`
-- **Utility separation** - Content retrieval utilities go in `src/utils/` folder
-- **Hook access** - Components access content through hooks in `src/hooks/`
-
-### Internationalization Guidelines
-
-- **Translation hook** - Use `useTranslations()` hook in components for text content
-- **Content structure** - All text content must be in `src/content/translations.ts` 
-- **Utility functions** - Translation utilities in `src/utils/i18n.ts`
-- **Language detection** - Regional language is automatically detected from browser
-- **Fallback language** - English is always the fallback language
-- **Template strings** - Use `t('key', variables)` for dynamic content with placeholders
-
-### Data Folder Guidelines
-
-- **Data only** - The `src/data/` folder should only contain data files and type definitions
-- **No utility functions** - Never export utility functions from data files
-- **One enabler function maximum** - Only include simple data transformation functions if absolutely necessary
-- **Import utilities directly** - Components and hooks should import utility functions directly from `src/utils/`
-
-### Naming Conventions
-
-- **File naming** - Use descriptive names that reflect the file's purpose
-  - Utils: `mapProjection.ts`, `cityDataProcessing.ts`, `mapCalculations.ts`
-  - Components: `CustomMap.tsx`, `MapControls.tsx`, `CityMarkers.tsx`
-  - Hooks: `useMapState.ts`, `useMapInteractions.ts`
-  - Data: `sweden_provinces.ts`, `swedish-cities.json`
-- **Consistency within folders** - All files in a folder should follow the same naming pattern
-- **Avoid duplicates** - Never create duplicate interfaces or types across files
-
-## Accessibility Guidelines
-
-- When adding new elements and content always make sure they are accessible according to a11y standard
 
 ## Testing Guidelines
 
@@ -155,55 +97,16 @@ src/
 
 **ALWAYS run tests when making changes to UI features** - Every change to map controls, provinces, cities, clouds, or accessibility features must be tested before committing.
 
-### Feature-Specific Test Mapping
+### Test Mapping
 
-When modifying specific features, run the corresponding test suites:
+- **Controls**: `npm run test:controls` - zoom, pan, reset, interactions
+- **Provinces**: `npm run test:provinces` - hover, selection, styling
+- **Cities**: `npm run test:cities` - visibility, markers, interactions
+- **Accessibility**: `npm run test:accessibility` - keyboard, ARIA, focus
+- **All tests**: `npm test` - run before major commits
 
-#### Map Controls Changes
-- **Run**: `npm run test:controls`
-- **When**: Modifying zoom, pan, reset functionality, mouse/wheel interactions, or control button behavior
-- **Tests**: Zoom in/out buttons, mouse wheel zoom, pan with drag, reset view, keyboard navigation
+**Always test before committing UI changes**
 
-#### Province Interactions Changes
-- **Run**: `npm run test:provinces`
-- **When**: Modifying province hover effects, selection logic, province styling, or province information display
-- **Tests**: Province hover states, click selection, deselection, province info display, cloud opacity changes
+### Test Requirements
 
-#### City Markers Changes
-- **Run**: `npm run test:cities`
-- **When**: Modifying city visibility logic, city marker styling, city interactions, or city data display
-- **Tests**: City visibility on province selection, city marker interactions, scaling with zoom, hover effects
-
-#### Cloud Animations Changes
-- **Run**: `npm run test:clouds`
-- **When**: Modifying cloud animations, opacity changes, or cloud layering
-- **Tests**: Cloud animation continuity, opacity changes with province selection, responsive behavior
-
-#### Accessibility Features Changes
-- **Run**: `npm run test:accessibility`
-- **When**: Modifying keyboard navigation, ARIA labels, focus management, or screen reader support
-- **Tests**: Keyboard navigation, ARIA compliance, focus indicators, reduced motion support
-
-#### Major UI Changes
-- **Run**: `npm test` (all tests)
-- **When**: Making changes that affect multiple UI components or core map functionality
-- **Tests**: Complete test suite covering all features
-
-### Test Integration Workflow
-
-1. **Before starting development**: Run relevant test suite to ensure baseline functionality
-2. **During development**: Run specific tests frequently to catch regressions early
-3. **Before committing**: Run all affected test suites to ensure no breaking changes
-4. **For accessibility changes**: Always run accessibility tests in addition to feature tests
-
-### Test Data Requirements
-
-Tests require specific `data-testid` attributes on components:
-- Map: `data-testid="custom-map"`
-- Controls: `data-testid="map-controls"`
-- Zoom buttons: `data-testid="zoom-in"`, `data-testid="zoom-out"`
-- Reset button: `data-testid="reset-view"`
-- Provinces: `data-testid="province-{provinceName}"`
-- Cities: `data-testid="city-{cityName}"`
-- Clouds: `data-testid="clouds"`
-- Info displays: `data-testid="province-info"`, `data-testid="city-info"`
+Components need `data-testid` attributes for testing. Always test before committing UI changes.
