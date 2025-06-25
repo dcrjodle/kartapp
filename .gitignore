@@ -31,3 +31,7 @@ tests/cypress/videos/
 
 # Logs
 *.log
+
+# Claude
+.claude/
+CLAUDE.md
