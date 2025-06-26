@@ -7,7 +7,7 @@
  * @author Generated with Claude Code
  */
 
-import React, { useEffect, useCallback, lazy, Suspense } from "react";
+import React, { useEffect, useCallback } from "react";
 import { type Provinces } from "../utils/mapProjection"; // TODO: Migrate to Province from types/geographic.ts
 import { useMapState } from "../hooks/useMapState";
 import { useMapInteractions } from "../hooks/useMapInteractions";
@@ -27,8 +27,6 @@ import CityMarkers from "./CityMarkers";
 import { type SwedishCity } from "../utils/cityDataProcessing";
 import "./CustomMap.scss";
 
-// Lazy load non-critical components
-const MovingClouds = lazy(() => import("./MovingClouds"));
 
 interface CustomMapProps {
   /** Array of county data with coordinate polygons */
@@ -146,6 +144,16 @@ const CustomMap: React.FC<CustomMapProps> = ({
     onProvinceChange?.(selectedProvince);
   }, [selectedProvince, onProvinceChange]);
 
+  // Query handlers for natural language interface
+  const handleProvinceSelect = useCallback((province: Provinces) => {
+    handleProvinceClick(province, 0); // Index not used for programmatic selection
+  }, [handleProvinceClick]);
+
+  const handleHighlightProvinces = useCallback((provinceNames: string[]) => {
+    // TODO: Implement province highlighting logic
+    console.log('Highlighting provinces:', provinceNames);
+  }, []);
+
   // Set up wheel event listener with passive: false to enable preventDefault
   useEffect(() => {
     const svg = svgRef.current;
@@ -224,6 +232,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
         onResetView={resetView}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
+        onProvinceSelect={handleProvinceSelect}
+        onHighlightProvinces={handleHighlightProvinces}
       />
     </div>
   );
