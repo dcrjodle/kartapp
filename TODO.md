@@ -29,6 +29,14 @@
 - [ ] Maintain navigation state and breadcrumb trail
 - [ ] Handle cases where user clicks city vs province directly
 
+## 5. Mobile-Responsive Control Panel
+- [ ] Move control panel to bottom of screen on mobile devices
+- [ ] Implement collapsible/expandable functionality for mobile
+- [ ] Add touch-friendly expand/collapse button or swipe gesture
+- [ ] Ensure natural language query input remains accessible
+- [ ] Optimize panel height for mobile keyboards
+- [ ] Test on various mobile screen sizes and orientations
+
 ## Implementation Notes
 
 ### City Icons (Priority: Medium)
@@ -55,3 +63,10 @@
 - City click → City info panel (with back to province option)
 - Query results → Appropriate info panel
 - Maintain history for proper back navigation
+
+### Mobile Responsiveness (Priority: High)
+- Current control panel is positioned top-left, unsuitable for mobile
+- Bottom positioning provides better thumb accessibility
+- Collapsible design saves screen real estate for map viewing
+- Consider swipe up/down gestures for natural mobile interaction
+- Ensure query input works well with mobile keyboards
