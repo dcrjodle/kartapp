@@ -76,7 +76,7 @@ AVAILABLE SWEDISH PROVINCES:
 ${availableProvinces.join(', ')}
 
 CURRENT DATA STATUS:
-${currentData ? 'Data loaded and available' : 'No data currently loaded'}
+${currentData ? `${currentData.type} data loaded (${currentData.count} ${currentData.type} available)` : 'No data currently loaded'}
 
 CAPABILITIES:
 - Show/highlight specific provinces on map
@@ -135,7 +135,10 @@ Response: {
   "confidence": 0.9
 }
 
-IMPORTANT: If requesting data analysis but no data is loaded, set intent to "unavailable" and explain what data is needed.
+IMPORTANT: 
+- If provinces data is loaded, you CAN show/select provinces from the available list
+- If requesting population/demographic analysis but no such data is loaded, set intent to "unavailable"
+- Always check if the requested province exists in the available provinces list
 `.trim();
   }
 

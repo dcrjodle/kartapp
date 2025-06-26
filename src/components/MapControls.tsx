@@ -61,7 +61,11 @@ const MapControls: React.FC<MapControlsProps> = memo(({
       const response = await queryService.processQuery({
         query: query.trim(),
         availableProvinces: provinces.map(p => p.name),
-        currentData: null // TODO: Pass actual data when available
+        currentData: {
+          type: 'provinces',
+          count: provinces.length,
+          available: true
+        }
       });
 
       setQueryResult(response);
