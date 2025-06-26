@@ -56,7 +56,7 @@ export class LLMService {
         function: 'processData',
         userAction: `process data with LLM: ${request.fileName}`,
         data: { 
-          model: this.config.model || 'gemini-pro',
+          model: this.config.model || 'gemini-1.5-flash',
           fileType: request.fileType,
           contentLength: request.rawContent.length 
         },
@@ -79,7 +79,7 @@ export class LLMService {
         source: 'LLMService',
         function: 'getDataSuggestions',
         userAction: `get data suggestions: ${request.fileName}`,
-        data: { model: this.config.model || 'gemini-pro' },
+        data: { model: this.config.model || 'gemini-1.5-flash' },
       }
     ) as Promise<string[]>;
   }
@@ -160,7 +160,7 @@ Return suggestions as JSON array:
   private async callLLM(prompt: string): Promise<string> {
     try {
       const model = this.genAI.getGenerativeModel({ 
-        model: this.config.model || 'gemini-pro',
+        model: this.config.model || 'gemini-1.5-flash',
         generationConfig: {
           maxOutputTokens: this.config.maxTokens || 4096,
           temperature: 0.1, // Low temperature for consistent data parsing
@@ -183,7 +183,7 @@ Return suggestions as JSON array:
           source: 'LLMService',
           function: 'callLLM',
           data: { 
-            model: this.config.model || 'gemini-pro',
+            model: this.config.model || 'gemini-1.5-flash',
             promptLength: prompt.length 
           },
         },
@@ -281,7 +281,7 @@ export const createLLMService = (): LLMService => {
 
   return new LLMService({
     apiKey,
-    model: process.env.REACT_APP_LLM_MODEL || 'gemini-pro',
+    model: process.env.REACT_APP_LLM_MODEL || 'gemini-1.5-flash',
     maxTokens: parseInt(process.env.REACT_APP_LLM_MAX_TOKENS || '4096'),
   });
 };

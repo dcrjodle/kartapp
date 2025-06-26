@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { createLLMService } from '../services/llmService';
+import { LLMService } from '../services/llmService';
 
 const LLMTest: React.FC = () => {
   const [result, setResult] = useState<string>('');
@@ -13,7 +13,19 @@ const LLMTest: React.FC = () => {
   const testLLM = async () => {
     try {
       setLoading(true);
-      const llmService = createLLMService();
+      
+      // Debug environment variables
+      console.log('All env vars:', Object.keys(process.env).filter(key => key.startsWith('REACT_APP')));
+      console.log('API Key loaded:', process.env.REACT_APP_LLM_API_KEY ? 'YES' : 'NOT FOUND');
+      console.log('Raw process.env:', process.env);
+      
+      const apiKey = process.env.REACT_APP_LLM_API_KEY || 'AIzaSyDbysaRUQIJAcTb3hEX4GRuXqu7mk7agOE';
+      
+      const llmService = new LLMService({
+        apiKey,
+        model: process.env.REACT_APP_LLM_MODEL || 'gemini-1.5-flash',
+        maxTokens: parseInt(process.env.REACT_APP_LLM_MAX_TOKENS || '4096')
+      });
       
       const testData = `province,population
 Stockholm,2377081
@@ -28,7 +40,8 @@ Malmö,500000`;
 
       setResult(JSON.stringify(response, null, 2));
     } catch (error) {
-      setResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('LLM Test Error:', error);
+      setResult(`Error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     } finally {
       setLoading(false);
     }

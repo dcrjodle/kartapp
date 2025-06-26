@@ -126,7 +126,11 @@ class ErrorHandler {
    */
   handleError(error: AppError): void {
     // Log to console with full debug info
-    console.error(error.getDebugInfo());
+    if (error instanceof AppError && typeof error.getDebugInfo === 'function') {
+      console.error(error.getDebugInfo());
+    } else {
+      console.error('Error:', error);
+    }
 
     // Add to error log
     this.errorLog.unshift(error);
@@ -140,7 +144,7 @@ class ErrorHandler {
     }
 
     // Show user-friendly message for high/critical errors
-    if (error.severity === 'high' || error.severity === 'critical') {
+    if (error instanceof AppError && (error.severity === 'high' || error.severity === 'critical')) {
       this.showUserNotification(error);
     }
   }
@@ -241,7 +245,7 @@ class ErrorHandler {
     
     notification.innerHTML = `
       <div style="font-weight: 600; margin-bottom: 8px;">Error ${error.errorId}</div>
-      <div>${error.getUserMessage()}</div>
+      <div>${error instanceof AppError && typeof error.getUserMessage === 'function' ? error.getUserMessage() : error.message}</div>
       <button onclick="this.parentElement.remove()" style="
         background: none; border: none; color: #c33; 
         float: right; margin-top: 8px; cursor: pointer;

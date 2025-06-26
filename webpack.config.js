@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
@@ -8,8 +9,8 @@ module.exports = (env, argv) => {
     entry: './src/index.tsx',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: isProduction ? '[name].[contenthash].js' : 'bundle.js',
-      chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
+      filename: isProduction ? '[name].[contenthash].js' : '[name].bundle.js',
+      chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].chunk.js',
       clean: true,
     },
     resolve: {
@@ -40,6 +41,14 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
         minify: isProduction,
+      }),
+      new webpack.DefinePlugin({
+        'process.env.REACT_APP_LLM_API_KEY': JSON.stringify(process.env.REACT_APP_LLM_API_KEY),
+        'process.env.REACT_APP_LLM_MODEL': JSON.stringify(process.env.REACT_APP_LLM_MODEL),
+        'process.env.REACT_APP_LLM_MAX_TOKENS': JSON.stringify(process.env.REACT_APP_LLM_MAX_TOKENS),
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
       }),
     ],
     optimization: {
