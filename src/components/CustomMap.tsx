@@ -97,6 +97,9 @@ const CustomMap: React.FC<CustomMapProps> = ({
     handleMouseMove,
     handleMouseUp,
     handleWheel,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
     handleProvinceClick,
     handleZoomIn,
     handleZoomOut,
@@ -182,6 +185,10 @@ const CustomMap: React.FC<CustomMapProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
         role="img"
         aria-label={t("accessibility.mapDescription", {
           count: provinces.length.toString(),

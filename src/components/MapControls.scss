@@ -36,6 +36,9 @@
     margin-bottom: 16px;
     border-bottom: 1px solid color.adjust($control-text, $alpha: -0.8);
     padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   // Title
@@ -282,22 +285,90 @@
     opacity: 0.8;
     font-style: italic;
   }
+
+  // Toggle button for mobile
+  &__toggle {
+    @include button-reset;
+    padding: 4px;
+    background-color: transparent;
+    color: $control-text;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: color.adjust($control-text, $alpha: -0.9);
+    }
+    
+    &:focus {
+      outline: 2px solid color.adjust($button-background, $lightness: 20%);
+      outline-offset: 1px;
+    }
+    
+    svg {
+      display: block;
+    }
+  }
+
+  // Mobile-specific styles
+  &--mobile {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    top: auto;
+    min-width: auto;
+    max-width: none;
+    z-index: 20;
+  }
+
+  // Collapsed state
+  &--collapsed {
+    .map-controls__header {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
 }
 
 // Responsive adjustments
 @media (max-width: 768px) {
   .map-controls {
-    top: 5px;
-    left: 5px;
-    padding: 8px;
-
-    &__info {
-      font-size: 11px;
+    // Mobile styles are handled by --mobile class
+    &:not(.map-controls--mobile) {
+      top: 5px;
+      left: 5px;
+      padding: 8px;
     }
 
-    &__reset-button {
-      padding: 4px 8px;
-      font-size: 11px;
+    &__info {
+      font-size: 12px;
+    }
+
+    &__reset-button,
+    &__zoom-button {
+      padding: 10px 12px;
+      font-size: 14px;
+      min-height: 44px; // Larger touch targets
+    }
+
+    &__query-input {
+      padding: 10px 12px;
+      font-size: 16px; // Prevent zoom on iOS
+      min-height: 44px;
+    }
+
+    &__query-submit {
+      padding: 10px 16px;
+      min-height: 44px;
+    }
+
+    &__title {
+      font-size: 16px;
+    }
+
+    &__section-title {
+      font-size: 13px;
     }
   }
 }

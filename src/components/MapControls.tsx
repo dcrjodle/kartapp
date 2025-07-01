@@ -4,7 +4,7 @@
  * Displays map information and control buttons
  */
 
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { type Provinces, type Bounds } from '../utils/mapProjection';
 import { type ViewBox } from '../utils/mapInteractions';
 import { useTranslations } from '../hooks/useTranslations';
@@ -43,6 +43,24 @@ const MapControls: React.FC<MapControlsProps> = memo(({
   const [query, setQuery] = useState('');
   const [queryResult, setQueryResult] = useState<QueryResponse | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+      // Auto-collapse on mobile by default
+      if (window.innerWidth <= 768) {
+        setIsCollapsed(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleQuerySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,13 +126,40 @@ const MapControls: React.FC<MapControlsProps> = memo(({
     setQueryResult(null);
   };
   
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
-    <div className="map-controls" role="region" aria-label={t('map.title')} data-testid="map-controls">
+    <div 
+      className={`map-controls ${isCollapsed ? 'map-controls--collapsed' : ''} ${isMobile ? 'map-controls--mobile' : ''}`} 
+      role="region" 
+      aria-label={t('map.title')} 
+      data-testid="map-controls"
+    >
       <div className="map-controls__header">
         <h2 className="map-controls__title">{t('map.title')}</h2>
+        {isMobile && (
+          <button
+            onClick={toggleCollapse}
+            className="map-controls__toggle"
+            aria-label={isCollapsed ? 'Expand controls' : 'Collapse controls'}
+            data-testid="controls-toggle"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              {isCollapsed ? (
+                <path d="M18 15l-6-6-6 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              ) : (
+                <path d="M6 9l6 6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              )}
+            </svg>
+          </button>
+        )}
       </div>
 
-      {/* Natural Language Query Section */}
+      {!isCollapsed && (
+        <>
+        {/* Natural Language Query Section */}
       <div className="map-controls__section map-controls__section--query">
         <h3 className="map-controls__section-title">Ask about the map</h3>
         <form onSubmit={handleQuerySubmit} className="map-controls__query-form">
@@ -246,6 +291,9 @@ const MapControls: React.FC<MapControlsProps> = memo(({
         </button>
         </div>
       </div>
+      
+        </>
+      )}
     </div>
   );
 });
