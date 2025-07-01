@@ -74,6 +74,24 @@ export const useMapInteractions = ({
     hasMoved: false
   });
 
+  // Use refs for frequently changing values to avoid useEffect re-runs
+  const touchStateRef = useRef(touchState);
+  const lastMousePosRef = useRef(lastMousePos);
+  const zoomRef = useRef(zoom);
+  
+  // Update refs when state changes
+  useEffect(() => {
+    touchStateRef.current = touchState;
+  }, [touchState]);
+  
+  useEffect(() => {
+    lastMousePosRef.current = lastMousePos;
+  }, [lastMousePos]);
+  
+  useEffect(() => {
+    zoomRef.current = zoom;
+  }, [zoom]);
+
   /**
    * Helper function to calculate distance between two touches
    */
@@ -140,7 +158,8 @@ export const useMapInteractions = ({
     };
 
     const handleTouchMoveNative = (e: TouchEvent) => {
-      if (!touchState.active) return;
+      const currentTouchState = touchStateRef.current;
+      if (!currentTouchState.active) return;
 
       const touches = Array.from(e.touches).map(touch => ({
         id: touch.identifier,
@@ -151,29 +170,43 @@ export const useMapInteractions = ({
       if (touches.length === 1) {
         // Single touch - check if it's a pan gesture
         const touch = touches[0];
-        const deltaX = touch.x - touchState.lastCenter.x;
-        const deltaY = touch.y - touchState.lastCenter.y;
+        
+        // For panning, we want to use the last mouse position, not the center
+        const lastPos = currentTouchState.hasMoved ? 
+          lastMousePosRef.current : 
+          currentTouchState.lastCenter;
+          
+        const deltaX = touch.x - lastPos.x;
+        const deltaY = touch.y - lastPos.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
-        // Only start panning if we've moved significantly (> 10px)
-        if (distance > 10) {
-          // Prevent default to stop scrolling
-          e.preventDefault();
-          
-          if (!touchState.hasMoved) {
-            // First significant movement - start dragging
-            setIsDragging(true);
-            setHasDragged(true);
-            setTouchState(prev => ({ ...prev, hasMoved: true }));
+        // Lower threshold for better responsiveness
+        if (distance > 2) {
+          if (!currentTouchState.hasMoved) {
+            // First movement - check if it's significant enough to start panning
+            if (distance > 5) {
+              // Prevent default to stop scrolling
+              e.preventDefault();
+              // Start dragging
+              setIsDragging(true);
+              setHasDragged(true);
+              setTouchState(prev => ({ ...prev, hasMoved: true }));
+            }
+          } else {
+            // Already panning - continue with smooth movement
+            e.preventDefault();
           }
           
-          setViewBox((prev) => {
-            const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoom);
-            return newViewBox;
-          });
-          
-          // Update mouse position for consistency
-          setLastMousePos({ x: touch.x, y: touch.y });
+          // Always update viewbox if we're in panning mode
+          if (currentTouchState.hasMoved || distance > 5) {
+            setViewBox((prev) => {
+              const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoomRef.current);
+              return newViewBox;
+            });
+            
+            // Update mouse position for consistency
+            setLastMousePos({ x: touch.x, y: touch.y });
+          }
         }
         
       } else if (touches.length === 2) {
@@ -183,11 +216,11 @@ export const useMapInteractions = ({
         const newDistance = calculateDistance(touches[0], touches[1]);
         const newCenter = calculateCenter(touches);
         
-        if (touchState.lastDistance > 0) {
-          const zoomFactor = newDistance / touchState.lastDistance;
-          const newZoom = constrainZoom(zoom * zoomFactor, minZoom, maxZoom);
+        if (currentTouchState.lastDistance > 0) {
+          const zoomFactor = newDistance / currentTouchState.lastDistance;
+          const newZoom = constrainZoom(zoomRef.current * zoomFactor, minZoom, maxZoom);
           
-          if (newZoom !== zoom) {
+          if (newZoom !== zoomRef.current) {
             setZoom(newZoom);
             
             const rect = svgElement.getBoundingClientRect();
@@ -205,13 +238,13 @@ export const useMapInteractions = ({
         }
         
         // Pan with center movement
-        if (touchState.touches.length === 2) {
-          const deltaX = newCenter.x - touchState.lastCenter.x;
-          const deltaY = newCenter.y - touchState.lastCenter.y;
+        if (currentTouchState.touches.length === 2) {
+          const deltaX = newCenter.x - currentTouchState.lastCenter.x;
+          const deltaY = newCenter.y - currentTouchState.lastCenter.y;
           
           if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
             setViewBox((prev) => {
-              const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoom);
+              const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoomRef.current);
               return newViewBox;
             });
           }
@@ -223,11 +256,12 @@ export const useMapInteractions = ({
         ...prev,
         touches,
         lastDistance: touches.length === 2 ? calculateDistance(touches[0], touches[1]) : prev.lastDistance,
-        lastCenter: calculateCenter(touches)
+        lastCenter: touches.length === 2 ? calculateCenter(touches) : prev.lastCenter // Don't update center for single touch during panning
       }));
     };
 
     const handleTouchEndNative = (e: TouchEvent) => {
+      const currentTouchState = touchStateRef.current;
       const remainingTouches = Array.from(e.touches).map(touch => ({
         id: touch.identifier,
         x: touch.clientX,
@@ -237,7 +271,7 @@ export const useMapInteractions = ({
       if (remainingTouches.length === 0) {
         // All touches ended
         // Only prevent default if we were in a multi-touch gesture or actively panning
-        if (touchState.touches.length > 1 || touchState.hasMoved) {
+        if (currentTouchState.touches.length > 1 || currentTouchState.hasMoved) {
           e.preventDefault();
         }
         
@@ -276,12 +310,6 @@ export const useMapInteractions = ({
   }, [
     showOnlySelected,
     selectedProvince,
-    touchState.active,
-    touchState.lastCenter,
-    touchState.hasMoved,
-    touchState.touches.length,
-    touchState.lastDistance,
-    zoom,
     minZoom,
     maxZoom,
     calculateCenter,
