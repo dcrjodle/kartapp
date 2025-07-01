@@ -42,6 +42,8 @@ interface TouchState {
   touches: Array<{ id: number; x: number; y: number }>;
   lastDistance: number;
   lastCenter: { x: number; y: number };
+  startTime: number;
+  hasMoved: boolean;
 }
 
 export const useMapInteractions = ({
@@ -67,7 +69,9 @@ export const useMapInteractions = ({
     active: false,
     touches: [],
     lastDistance: 0,
-    lastCenter: { x: 0, y: 0 }
+    lastCenter: { x: 0, y: 0 },
+    startTime: 0,
+    hasMoved: false
   });
 
   /**
@@ -250,8 +254,6 @@ export const useMapInteractions = ({
    * Handle touch start event
    */
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    
     // Disable interactions when showing only selected province
     if (showOnlySelected && selectedProvince) {
       return;
@@ -269,23 +271,26 @@ export const useMapInteractions = ({
       active: true,
       touches,
       lastDistance: touches.length === 2 ? calculateDistance(touches[0], touches[1]) : 0,
-      lastCenter: center
+      lastCenter: center,
+      startTime: Date.now(),
+      hasMoved: false
     });
 
-    // For single touch, also set mouse state for consistency
+    // For single touch, set up potential dragging but don't mark as dragging yet
     if (touches.length === 1) {
-      setIsDragging(true);
-      setHasDragged(false);
       setLastMousePos({ x: touches[0].x, y: touches[0].y });
     }
-  }, [showOnlySelected, selectedProvince, calculateCenter, calculateDistance, setIsDragging, setHasDragged, setLastMousePos]);
+    
+    // Only prevent default for multi-touch gestures
+    if (touches.length > 1) {
+      e.preventDefault();
+    }
+  }, [showOnlySelected, selectedProvince, calculateCenter, calculateDistance, setLastMousePos]);
 
   /**
    * Handle touch move event
    */
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    
     if (!touchState.active) return;
 
     const touches = Array.from(e.touches).map(touch => ({
@@ -295,23 +300,36 @@ export const useMapInteractions = ({
     }));
 
     if (touches.length === 1) {
-      // Single touch - pan
+      // Single touch - check if it's a pan gesture
       const touch = touches[0];
       const deltaX = touch.x - touchState.lastCenter.x;
       const deltaY = touch.y - touchState.lastCenter.y;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Mark as dragged if there's significant movement
-      if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
-        setHasDragged(true);
+      // Only start panning if we've moved significantly (> 10px)
+      if (distance > 10) {
+        if (!touchState.hasMoved) {
+          // First significant movement - now prevent default and start dragging
+          e.preventDefault();
+          setIsDragging(true);
+          setHasDragged(true);
+        } else {
+          e.preventDefault();
+        }
+        
+        setViewBox((prev) => {
+          const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoom);
+          return newViewBox;
+        });
+        
+        // Update mouse position for consistency
+        setLastMousePos({ x: touch.x, y: touch.y });
+        
+        // Mark as moved
+        if (!touchState.hasMoved) {
+          setTouchState(prev => ({ ...prev, hasMoved: true }));
+        }
       }
-
-      setViewBox((prev) => {
-        const newViewBox = calculatePannedViewBox(prev, deltaX, deltaY, zoom);
-        return newViewBox;
-      });
-      
-      // Update mouse position for consistency
-      setLastMousePos({ x: touch.x, y: touch.y });
       
     } else if (touches.length === 2) {
       // Two touches - pinch to zoom
@@ -372,15 +390,14 @@ export const useMapInteractions = ({
     setHasDragged, 
     setViewBox, 
     setLastMousePos, 
-    setZoom
+    setZoom,
+    setIsDragging
   ]);
 
   /**
    * Handle touch end event
    */
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    
     const remainingTouches = Array.from(e.touches).map(touch => ({
       id: touch.identifier,
       x: touch.clientX,
@@ -389,11 +406,18 @@ export const useMapInteractions = ({
 
     if (remainingTouches.length === 0) {
       // All touches ended
+      // Only prevent default if we were in a multi-touch gesture or actively panning
+      if (touchState.touches.length > 1 || touchState.hasMoved) {
+        e.preventDefault();
+      }
+      
       setTouchState({
         active: false,
         touches: [],
         lastDistance: 0,
-        lastCenter: { x: 0, y: 0 }
+        lastCenter: { x: 0, y: 0 },
+        startTime: 0,
+        hasMoved: false
       });
       setIsDragging(false);
     } else {
@@ -405,7 +429,7 @@ export const useMapInteractions = ({
         lastCenter: calculateCenter(remainingTouches)
       }));
     }
-  }, [calculateDistance, calculateCenter, setIsDragging]);
+  }, [touchState.touches.length, touchState.hasMoved, calculateDistance, calculateCenter, setIsDragging]);
 
   return {
     svgRef,

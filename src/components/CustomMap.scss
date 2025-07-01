@@ -46,8 +46,7 @@
   background: $map-background;
   overflow: hidden;
   
-  // Prevent browser pan/zoom on mobile
-  touch-action: none;
+  // Basic mobile setup
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -60,6 +59,9 @@
     width: 100%;
     height: 100%;
     display: block;
+    
+    // Prevent browser pan/zoom only on the interactive SVG
+    touch-action: none;
     
     &:focus {
       outline: 2px solid #007acc;
