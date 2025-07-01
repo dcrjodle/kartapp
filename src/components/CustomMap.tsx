@@ -27,7 +27,6 @@ import CityMarkers from "./CityMarkers";
 import { type SwedishCity } from "../utils/cityDataProcessing";
 import "./CustomMap.scss";
 
-
 interface CustomMapProps {
   /** Array of county data with coordinate polygons */
   provinces: Provinces[];
@@ -62,7 +61,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
 }) => {
   // Translation hook
   const { t } = useTranslations();
-  
+
   // Custom hooks for state management
   const mapState = useMapState(initialZoom);
   const {
@@ -76,11 +75,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
   } = mapState;
 
   // Map calculations using custom hooks
-  const bounds = useMapBounds(
-    provinces,
-    selectedProvince,
-    showOnlySelected
-  );
+  const bounds = useMapBounds(provinces, selectedProvince, showOnlySelected);
   const mapDimensions = useMapDimensions(bounds);
   const provincePaths = useProvincePaths(provinces, bounds, mapDimensions);
   const { meridians, parallels } = useGridLines(
@@ -91,12 +86,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
 
   // Create reset function
   const resetView = useCallback(
-    createResetViewFunction(
-      provinces,
-      initialZoom,
-      resetState,
-      setViewBox
-    ),
+    createResetViewFunction(provinces, initialZoom, resetState, setViewBox),
     [provinces, initialZoom, resetState, setViewBox]
   );
 
@@ -145,13 +135,16 @@ const CustomMap: React.FC<CustomMapProps> = ({
   }, [selectedProvince, onProvinceChange]);
 
   // Query handlers for natural language interface
-  const handleProvinceSelect = useCallback((province: Provinces) => {
-    handleProvinceClick(province, 0); // Index not used for programmatic selection
-  }, [handleProvinceClick]);
+  const handleProvinceSelect = useCallback(
+    (province: Provinces) => {
+      handleProvinceClick(province, 0); // Index not used for programmatic selection
+    },
+    [handleProvinceClick]
+  );
 
   const handleHighlightProvinces = useCallback((provinceNames: string[]) => {
     // TODO: Implement province highlighting logic
-    console.log('Highlighting provinces:', provinceNames);
+    console.log("Highlighting provinces:", provinceNames);
   }, []);
 
   // Set up wheel event listener with passive: false to enable preventDefault
@@ -173,8 +166,14 @@ const CustomMap: React.FC<CustomMapProps> = ({
   }`;
 
   return (
-    <div className="custom-map" role="application" aria-label={t('map.title')} data-testid="custom-map">
-      {/* Main SVG map element */}
+    <div
+      className="custom-map"
+      role="application"
+      aria-label={t("map.title")}
+      data-testid="custom-map"
+    >
+      {/* Main SVG map element */
+      /*  TODO: Create context hook to avoid all the params in the sub components */}
       <svg
         ref={svgRef}
         className={svgClasses}
@@ -184,9 +183,9 @@ const CustomMap: React.FC<CustomMapProps> = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         role="img"
-        aria-label={t('accessibility.mapDescription', { 
-          count: provinces.length.toString(), 
-          selected: selectedProvince ? t('accessibility.provinceSelected') : ''
+        aria-label={t("accessibility.mapDescription", {
+          count: provinces.length.toString(),
+          selected: selectedProvince ? t("accessibility.provinceSelected") : "",
         })}
         tabIndex={0}
         aria-describedby="map-instructions"
@@ -218,7 +217,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
 
       {/* Hidden instructions for screen readers */}
       <div id="map-instructions" className="sr-only">
-        {t('map.instructions')}
+        {t("map.instructions")}
       </div>
 
       {/* Control panel */}
