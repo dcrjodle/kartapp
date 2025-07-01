@@ -121,7 +121,7 @@ export function processJsonStatData(dataset: Dataset): ProcessedSCBData {
   } catch (error) {
     createError(
       'Failed to process JSON-stat data',
-      { source: 'scbDataProcessing', error: error instanceof Error ? error.message : 'Unknown error' },
+      { source: 'scbDataProcessing', function: 'processJsonStatData', data: { error: error instanceof Error ? error.message : 'Unknown error' } },
       'high'
     );
     throw error;
@@ -200,13 +200,13 @@ export function mapDataToProvinces(
   const mappedProvinces = provinces.map(province => {
     // Find matching SCB region code
     const mapping = PROVINCE_MAPPING.find(m => 
-      m.provinceCode === province.code || 
+      m.provinceCode === province.id || 
       m.provinceName.toLowerCase() === province.name.toLowerCase()
     );
 
     if (!mapping) {
       return {
-        code: province.code,
+        code: province.id,
         name: province.name,
         value: null
       };
@@ -224,7 +224,7 @@ export function mapDataToProvinces(
     }
 
     return {
-      code: province.code,
+      code: province.id,
       name: province.name,
       value
     };
