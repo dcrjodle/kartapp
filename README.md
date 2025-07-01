@@ -1,10 +1,14 @@
-# KartApp - Interactive Swedish Province Map
+# Swedish Statistics Visualization Platform
 
-An interactive SVG-based map of Swedish provinces with city markers, internationalization support, and accessibility features. Built with React, TypeScript, and custom Mercator projection without external mapping libraries.
+Interactive data visualization application that displays statistical information overlaid on Swedish provinces and municipalities. Transform complex statistical data into intuitive visual representations for government analysis, research, business intelligence, and education.
+
+Built with React, TypeScript, and custom Mercator projection without external mapping libraries.
 
 ## Features
 
 - 🗺️ **Interactive Map**: Pan, zoom, and click to select Swedish provinces
+- 📊 **Statistical Data Visualization**: Heat maps and choropleth maps for data overlay
+- 🏛️ **SCB API Integration**: Direct integration with Statistics Sweden API
 - 🏙️ **City Markers**: Population-based city visualization with hover tooltips
 - 🌐 **Internationalization**: Automatic language detection (Swedish/English) with fallback
 - ♿ **Accessibility**: Full keyboard navigation and screen reader support
@@ -29,16 +33,33 @@ cd kartapp
 npm install
 
 # Start development server
-npm start
+npm run dev
 ```
 
 The application will be available at `http://localhost:3001`
 
+### Production
+
+```bash
+# Build for production
+npm run build
+
+# Start production server (localhost:10000)
+npm start
+```
+
 ### Available Scripts
 
-- `npm start` - Start development server
+- `npm run dev` - Start development server on http://localhost:3001
 - `npm run build` - Build for production
-- `npm test` - Run tests
+- `npm start` - Start production server on http://localhost:10000
+- `npm test` - Run all Cypress tests
+- `npm run test:open` - Open Cypress test runner GUI
+- `npm run test:controls` - Run map controls tests only
+- `npm run test:provinces` - Run province interaction tests only
+- `npm run test:cities` - Run city marker tests only
+- `npm run test:clouds` - Run cloud animation tests only
+- `npm run test:accessibility` - Run accessibility tests only
 
 ## Project Architecture
 
@@ -56,12 +77,18 @@ src/
 │   ├── useMapInteractions.ts # Mouse/wheel events
 │   ├── useMapKeyboard.ts # Keyboard events
 │   └── useTranslations.ts # Internationalization
+├── services/            # API services
+│   └── scbApi.ts        # SCB API integration
 ├── utils/               # Utility functions
 │   ├── mapProjection.ts # Geographic calculations
 │   ├── mapInteractions.ts # Interaction utilities
 │   ├── mapCalculations.ts # Calculation hooks
 │   ├── cityDataProcessing.ts # City data utilities
+│   ├── scbDataProcessing.ts # SCB data processing
 │   └── i18n.ts         # Translation utilities
+├── types/               # TypeScript types
+│   ├── geographic.ts    # Geographic data types
+│   └── scb.ts          # SCB API types
 ├── content/             # Text content
 │   └── translations.ts  # All translations
 ├── styles/              # Styling
@@ -73,9 +100,12 @@ src/
 
 ## Technology Stack
 
-- **React 19** with TypeScript
-- **Webpack 5** + SASS
-- **Custom SVG rendering** with Mercator projection
+- **Frontend**: React 19 + TypeScript
+- **Build**: Webpack 5 + SASS
+- **Mapping**: Custom SVG rendering with Mercator projection
+- **Testing**: Cypress for E2E testing
+- **Production**: Express.js static file server
+- **APIs**: SCB (Statistics Sweden) API integration
 - **No external mapping libraries**
 
 ## Key Features
