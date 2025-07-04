@@ -157,6 +157,25 @@ const MapControls: React.FC<MapControlsProps> = memo(({
         )}
       </div>
 
+      {/* Always visible reset button on mobile */}
+      {isMobile && (
+        <div className="map-controls__mobile-reset">
+          <button
+            onClick={onResetView}
+            className="map-controls__reset-button map-controls__reset-button--always-visible"
+            type="button"
+            data-testid="mobile-reset-view"
+            aria-label={
+              selectedProvince && showOnlySelected
+                ? t('map.showAllProvinces')
+                : t('map.resetMapView')
+            }
+          >
+            {selectedProvince && showOnlySelected ? t('map.showAll') : t('map.resetView')}
+          </button>
+        </div>
+      )}
+
       {!isCollapsed && (
         <>
         {/* Natural Language Query Section */}
@@ -276,19 +295,22 @@ const MapControls: React.FC<MapControlsProps> = memo(({
             </button>
           )}
         </div>
-        <button
-          onClick={onResetView}
-          className="map-controls__reset-button"
-          type="button"
-          data-testid="reset-view"
-          aria-label={
-            selectedProvince && showOnlySelected
-              ? t('map.showAllProvinces')
-              : t('map.resetMapView')
-          }
-        >
-          {selectedProvince && showOnlySelected ? t('map.showAll') : t('map.resetView')}
-        </button>
+        {/* Hide reset button on mobile since we have the always-visible one */}
+        {!isMobile && (
+          <button
+            onClick={onResetView}
+            className="map-controls__reset-button"
+            type="button"
+            data-testid="reset-view"
+            aria-label={
+              selectedProvince && showOnlySelected
+                ? t('map.showAllProvinces')
+                : t('map.resetMapView')
+            }
+          >
+            {selectedProvince && showOnlySelected ? t('map.showAll') : t('map.resetView')}
+          </button>
+        )}
         </div>
       </div>
       

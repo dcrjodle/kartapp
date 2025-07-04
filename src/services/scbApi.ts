@@ -94,7 +94,7 @@ export class SCBApiService {
       signal: this.abortController.signal,
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
         ...options.headers
       }
     };

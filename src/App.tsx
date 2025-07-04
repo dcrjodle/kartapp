@@ -8,6 +8,10 @@ import './utils/errorHandling'; // Initialize global error handling
 // Lazy load non-critical components
 const MovingClouds = lazy(() => import("./components/MovingClouds"));
 
+// Development/testing components
+import LLMTest from "./components/LLMTest";
+import SCBTest from "./components/SCBTest";
+
 const App: React.FC = () => {
   const [zoom, setZoom] = useState(1);
   const [selectedProvince, setSelectedProvince] = useState(null);
@@ -31,6 +35,8 @@ const App: React.FC = () => {
         onZoomChange={setZoom}
         onProvinceChange={setSelectedProvince}
       />
+      <LLMTest />
+      <SCBTest />
     </div>
   );
 };
