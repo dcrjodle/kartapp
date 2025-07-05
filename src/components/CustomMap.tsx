@@ -134,18 +134,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
     onProvinceChange?.(selectedProvince);
   }, [selectedProvince, onProvinceChange]);
 
-  // Query handlers for natural language interface
-  const handleProvinceSelect = useCallback(
-    (province: Provinces) => {
-      handleProvinceClick(province, 0); // Index not used for programmatic selection
-    },
-    [handleProvinceClick]
-  );
-
-  const handleHighlightProvinces = useCallback((provinceNames: string[]) => {
-    // TODO: Implement province highlighting logic
-    console.log("Highlighting provinces:", provinceNames);
-  }, []);
 
   // Set up wheel event listener with passive: false to enable preventDefault
   useEffect(() => {
@@ -231,8 +219,6 @@ const CustomMap: React.FC<CustomMapProps> = ({
         onResetView={resetView}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
-        onProvinceSelect={handleProvinceSelect}
-        onHighlightProvinces={handleHighlightProvinces}
       />
     </div>
   );

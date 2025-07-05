@@ -1,26 +1,9 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
-const dotenv = require('dotenv');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
-  
-  // Load environment variables from .env.local
-  const envPath = path.resolve(__dirname, '.env.local');
-  const fileEnv = dotenv.config({ path: envPath }).parsed || {};
-  
-  // Combine with process.env and filter REACT_APP_ variables
-  const envVars = Object.keys({ ...process.env, ...fileEnv })
-    .filter(key => key.startsWith('REACT_APP_'))
-    .reduce((acc, key) => {
-      acc[`process.env.${key}`] = JSON.stringify((fileEnv[key] || process.env[key]) || '');
-      return acc;
-    }, {});
-  
-  // Debug: Log environment variables being injected
-  console.log('Environment variables found:', Object.keys(envVars));
-  console.log('API Key present:', !!envVars['process.env.REACT_APP_LLM_API_KEY']);
   
   return {
     entry: './src/index.tsx',
@@ -59,7 +42,6 @@ module.exports = (env, argv) => {
         template: './public/index.html',
         minify: isProduction,
       }),
-      new webpack.DefinePlugin(envVars),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),

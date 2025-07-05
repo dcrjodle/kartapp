@@ -3,14 +3,9 @@ import CustomMap from "./components/CustomMap";
 import { provincesData } from "./data/sweden_provinces";
 import { type SwedishCity, processCityData, filterCitiesByPopulation } from "./utils/cityDataProcessing";
 import swedishCitiesData from "./data/swedish-cities.json";
-import './utils/errorHandling'; // Initialize global error handling
 
 // Lazy load non-critical components
 const MovingClouds = lazy(() => import("./components/MovingClouds"));
-
-// Development/testing components
-import LLMTest from "./components/LLMTest";
-import SCBTest from "./components/SCBTest";
 
 const App: React.FC = () => {
   const [zoom, setZoom] = useState(1);
@@ -35,8 +30,6 @@ const App: React.FC = () => {
         onZoomChange={setZoom}
         onProvinceChange={setSelectedProvince}
       />
-      <LLMTest />
-      <SCBTest />
     </div>
   );
 };

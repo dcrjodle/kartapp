@@ -6,11 +6,9 @@
 
 import React, { memo, useMemo } from 'react';
 import { projectToSVG, type Bounds, type MapDimensions } from '../utils/mapProjection';
-import { SwedishCity, getCitySizeCategory } from '../utils/cityDataProcessing';
+import { SwedishCity } from '../utils/cityDataProcessing';
 import { type ViewBox } from '../utils/mapInteractions';
-import { getProvinceByName } from '../data/standardized-provinces';
 import { useTranslations } from '../hooks/useTranslations';
-import { createError } from '../utils/errorHandling';
 import './CityMarkers.scss';
 
 interface CityMarkersProps {
@@ -22,6 +20,14 @@ interface CityMarkersProps {
   showCities?: boolean;
   viewBox: ViewBox;
 }
+
+// Simple helper function for city size categorization
+const getCitySizeCategory = (population: number): 'small' | 'medium' | 'large' | 'major' => {
+  if (population >= 500000) return 'major';
+  if (population >= 200000) return 'large';
+  if (population >= 100000) return 'medium';
+  return 'small';
+};
 
 const CityMarkers: React.FC<CityMarkersProps> = memo(({
   cities,
@@ -37,87 +43,32 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
 
   // Memoize visible cities calculation
   const visibleCities = useMemo(() => {
-    try {
-      if (!selectedProvince) {
-        return []; // No cities shown when no province is selected
-      }
-
-      if (!cities || cities.length === 0) {
-        console.warn('⚠️ No cities data available for filtering');
-        return [];
-      }
-
-      // Use standardized province matching instead of fragile string matching
-      const standardizedProvince = getProvinceByName(selectedProvince.name);
-      
-      const filteredCities = cities.filter(city => {
-        try {
-          if (!city || typeof city.population !== 'number') {
-            console.warn('⚠️ Invalid city data:', city);
-            return false;
-          }
-
-          if (city.population < 30000) return false; // Only cities with 30k+ population
-          
-          // Try multiple matching strategies
-          const cityAdminLower = city.admin_name?.toLowerCase() || '';
-          const provinceName = selectedProvince.name?.toLowerCase() || '';
-          
-          if (!cityAdminLower || !provinceName) {
-            console.warn('⚠️ Missing admin_name or province name:', { city: city.name, cityAdmin: city.admin_name, provinceName: selectedProvince.name });
-            return false;
-          }
-          
-          // Primary match: exact name match
-          if (cityAdminLower === provinceName) return true;
-          
-          // Secondary match: check aliases if standardized province exists
-          if (standardizedProvince?.aliases) {
-            return standardizedProvince.aliases.some(alias => 
-              cityAdminLower === alias.toLowerCase()
-            );
-          }
-          
-          // Fallback: partial name matching (less reliable)
-          return cityAdminLower.includes(provinceName) || 
-                 city.name.toLowerCase().includes(provinceName);
-        } catch (error) {
-          createError(
-            'Error filtering individual city',
-            {
-              source: 'CityMarkers',
-              function: 'visibleCities.filter',
-              data: { city, selectedProvince: selectedProvince.name },
-            },
-            'low'
-          );
-          return false;
-        }
-      });
-
-      console.log(`🏙️ Filtered cities for ${selectedProvince.name}: ${filteredCities.length} cities`);
-      return filteredCities;
-    } catch (error) {
-      createError(
-        'Error calculating visible cities',
-        {
-          source: 'CityMarkers',
-          function: 'visibleCities',
-          data: { 
-            citiesCount: cities?.length || 0, 
-            selectedProvince: selectedProvince?.name || 'unknown' 
-          },
-        },
-        'medium'
-      );
-      return [];
+    if (!selectedProvince || !cities || cities.length === 0) {
+      return cities || []; // Show all cities when no province is selected
     }
+
+    // Simple province filtering based on province property
+    const filteredCities = cities.filter(city => {
+      if (!city || typeof city.population !== 'number') return false;
+      if (city.population < 30000) return false; // Only cities with 30k+ population
+      
+      // Match by province property if available, otherwise show all cities
+      if (city.province) {
+        const cityProvince = city.province.toLowerCase();
+        const selectedProvinceName = selectedProvince.name?.toLowerCase() || '';
+        return cityProvince.includes(selectedProvinceName) || selectedProvinceName.includes(cityProvince);
+      }
+      
+      return true; // Show city if no province data
+    });
+
+    return filteredCities;
   }, [cities, selectedProvince]);
 
   return (
     <g role="group" aria-label={t('cities.population')}>
-      {visibleCities.map((city) => {
-        const [x, y] = projectToSVG(city.lng, city.lat, bounds, mapDimensions);
+      {visibleCities.map((city, index) => {
+        const [x, y] = projectToSVG(city.longitude, city.latitude, bounds, mapDimensions);
         const sizeCategory = getCitySizeCategory(city.population);
         
         // Calculate base sizes for different population categories
@@ -140,7 +91,7 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
         
         return (
           <g 
-            key={city.id} 
+            key={`${city.name}-${index}`} 
             className="city-marker-group"
             style={{
               transform: `scale(${transformScale})`,

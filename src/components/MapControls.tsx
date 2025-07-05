@@ -8,8 +8,6 @@ import React, { memo, useState, useEffect } from 'react';
 import { type Provinces, type Bounds } from '../utils/mapProjection';
 import { type ViewBox } from '../utils/mapInteractions';
 import { useTranslations } from '../hooks/useTranslations';
-import { QueryService, type QueryResponse } from '../services/queryService';
-import { createLLMService } from '../services/llmService';
 import './MapControls.scss';
 
 interface MapControlsProps {
@@ -22,8 +20,6 @@ interface MapControlsProps {
   onResetView: () => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
-  onProvinceSelect?: (province: Provinces) => void;
-  onHighlightProvinces?: (provinces: string[]) => void;
 }
 
 const MapControls: React.FC<MapControlsProps> = memo(({
@@ -36,13 +32,8 @@ const MapControls: React.FC<MapControlsProps> = memo(({
   onResetView,
   onZoomIn,
   onZoomOut,
-  onProvinceSelect,
-  onHighlightProvinces,
 }) => {
   const { t } = useTranslations();
-  const [query, setQuery] = useState('');
-  const [queryResult, setQueryResult] = useState<QueryResponse | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -62,69 +53,6 @@ const MapControls: React.FC<MapControlsProps> = memo(({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleQuerySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || isProcessing) return;
-
-    setIsProcessing(true);
-    setQueryResult(null);
-
-    try {
-      // Debug environment variables
-      console.log('REACT_APP_LLM_API_KEY:', process.env.REACT_APP_LLM_API_KEY ? 'Found' : 'Not found');
-      
-      const llmService = createLLMService();
-      const queryService = new QueryService(llmService);
-      
-      const response = await queryService.processQuery({
-        query: query.trim(),
-        availableProvinces: provinces.map(p => p.name),
-        currentData: {
-          type: 'provinces',
-          count: provinces.length,
-          available: true
-        }
-      });
-
-      setQueryResult(response);
-
-      // Execute the action if successful
-      if (response.success && response.action) {
-        switch (response.action.type) {
-          case 'select_province':
-            if (onProvinceSelect && response.action.targets.length > 0) {
-              const targetProvince = provinces.find(p => 
-                p.name.toLowerCase() === response.action!.targets[0].toLowerCase()
-              );
-              if (targetProvince) {
-                onProvinceSelect(targetProvince);
-              }
-            }
-            break;
-          case 'highlight_provinces':
-            if (onHighlightProvinces) {
-              onHighlightProvinces(response.action.targets);
-            }
-            break;
-        }
-      }
-    } catch (error) {
-      setQueryResult({
-        success: false,
-        intent: 'unavailable',
-        entities: [],
-        message: `Error processing query: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        confidence: 0
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleQueryClear = () => {
-    setQuery('');
-    setQueryResult(null);
-  };
   
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -178,57 +106,6 @@ const MapControls: React.FC<MapControlsProps> = memo(({
 
       {!isCollapsed && (
         <>
-        {/* Natural Language Query Section */}
-      <div className="map-controls__section map-controls__section--query">
-        <h3 className="map-controls__section-title">Ask about the map</h3>
-        <form onSubmit={handleQuerySubmit} className="map-controls__query-form">
-          <div className="map-controls__query-input-group">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g., 'show me Stockholm', 'provinces with highest population'"
-              className="map-controls__query-input"
-              disabled={isProcessing}
-              data-testid="query-input"
-              aria-label="Map query input"
-            />
-            <button
-              type="submit"
-              disabled={!query.trim() || isProcessing}
-              className="map-controls__query-submit"
-              data-testid="query-submit"
-            >
-              {isProcessing ? '...' : 'Ask'}
-            </button>
-            {query && (
-              <button
-                type="button"
-                onClick={handleQueryClear}
-                className="map-controls__query-clear"
-                data-testid="query-clear"
-                aria-label="Clear query"
-              >
-                ×
-              </button>
-            )}
-          </div>
-        </form>
-        
-        {/* Query Result */}
-        {queryResult && (
-          <div className={`map-controls__query-result ${queryResult.success ? 'success' : 'error'}`} data-testid="query-result">
-            <div className="map-controls__query-message">
-              {queryResult.message}
-            </div>
-            {queryResult.confidence > 0 && (
-              <div className="map-controls__query-confidence">
-                Confidence: {Math.round(queryResult.confidence * 100)}%
-              </div>
-            )}
-          </div>
-        )}
-      </div>
       
       <div className="map-controls__section map-controls__section--info">
         <h3 className="map-controls__section-title">{t('map.information')}</h3>
@@ -255,10 +132,6 @@ const MapControls: React.FC<MapControlsProps> = memo(({
         <div className="map-controls__info-item">
           {t('map.viewBox')}: ({viewBox.x.toFixed(0)}, {viewBox.y.toFixed(0)})
         </div>
-        {/* Placeholder for city info */}
-          <div className="map-controls__info-item" data-testid="city-info" style={{ display: 'none' }}>
-            City information placeholder
-          </div>
         </div>
       </div>
       
