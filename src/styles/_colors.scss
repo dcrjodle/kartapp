@@ -1,49 +1,49 @@
 /**
- * Color Variables
- * Central color definitions for the entire application
+ * Color Variables - Grayscale Architectural Map Theme
+ * Monochrome grayscale palette for clean architectural sketch aesthetic
  */
 
-// Map background and grid colors
-$map-background: linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 50%, #e8f4fd 100%);
-$grid-color: #e0e0e0;
-$grid-line-color: #ccc;
+// Map background colors - white page background with light map
+$map-background: white;
+$grid-color: #d0d0d0;
+$grid-line-color: #c0c0c0;
 
-// Province and region colors
-$province-fill: #4a90e2;
-$province-stroke: #2c5aa0;
-$province-selected-stroke: #e67e22;
-$province-focus-stroke: #007acc;
+// Province and region colors - grayscale with off-white fill
+$province-fill: #f8f8f8;
+$province-stroke: #606060;
+$province-selected-stroke: #404040;
+$province-focus-stroke: #505050;
 
-// County colors (legacy)
-$county-fill: #4a90e2;
-$county-stroke: #2c5aa0;
-$detailed-county-fill: #e74c3c;
-$detailed-county-stroke: #c0392b;
+// County colors (legacy) - converted to grayscale
+$county-fill: #f8f8f8;
+$county-stroke: #606060;
+$detailed-county-fill: #e8e8e8;
+$detailed-county-stroke: #707070;
 
-// Sweden border color
-$sweden-border-color: #2c3e50;
+// Sweden border color - dark gray for definition
+$sweden-border-color: #404040;
 
-// City marker colors
-$city-color-major: #ff4444;
-$city-color-large: #ff8844;
-$city-color-medium: #ffaa44;
-$city-color-small: #ffcc44;
+// City marker colors - grayscale tones for grid patterns
+$city-color-major: #404040;
+$city-color-large: #505050;
+$city-color-medium: #606060;
+$city-color-small: #707070;
 
-// City label colors
-$city-label-color: #333;
-$city-label-background: rgba(255, 255, 255, 0.9);
+// City label colors - darker for contrast on light background
+$city-label-color: #404040;
+$city-label-background: rgba(248, 248, 248, 0.9);
 
-// Control panel colors
-$control-background: white;
-$control-shadow: rgba(0, 0, 0, 0.2);
-$control-text: #666;
-$control-zoom-disabled: #999;
+// Control panel colors - grayscale neutrals
+$control-background: #f8f8f8;
+$control-shadow: rgba(64, 64, 64, 0.2);
+$control-text: #505050;
+$control-zoom-disabled: #999999;
 
-// Button colors
-$button-background: #4a90e2;
-$button-text: white;
+// Button colors - grayscale theme
+$button-background: #606060;
+$button-text: #f8f8f8;
 
 // General UI colors
-$white: #ffffff;
-$black: #000000;
+$white: #f8f8f8;
+$black: #404040;
 $transparent: transparent;

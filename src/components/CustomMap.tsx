@@ -24,6 +24,7 @@ import MapControls from "./MapControls";
 import MapGrid from "./MapGrid";
 import MapProvinces from "./MapProvinces";
 import CityMarkers from "./CityMarkers";
+import HandDrawnFilters from "./HandDrawnFilters";
 import { type SwedishCity } from "../utils/cityDataProcessing";
 import "./CustomMap.scss";
 
@@ -178,6 +179,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
         tabIndex={0}
         aria-describedby="map-instructions"
       >
+        <HandDrawnFilters />
+        
         <MapGrid
           mapDimensions={mapDimensions}
           meridians={meridians}

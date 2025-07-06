@@ -1,58 +1,21 @@
 /**
- * CityMarkers Component Styles
+ * CityMarkers Component Styles - City Names Only
  */
 
 @use "../styles/colors" as *;
 
-// City marker styles
-.city-marker {
-  cursor: pointer;
-  fill: $city-color-small;
-  stroke: #333;
-  stroke-width: 1.5;
-  transition: stroke-width 0.1s ease, opacity 0.1s ease;
-  
-  &:hover,
-  &:focus {
-    stroke-width: 3;
-    outline: none;
-    opacity: 0.8;
-  }
-  
-  // Size variations based on population (radius set dynamically in component)
-  &--small {
-    fill: $city-color-small;
-  }
-  
-  &--medium {
-    fill: $city-color-medium;
-  }
-  
-  &--large {
-    fill: $city-color-large;
-  }
-  
-  &--major {
-    fill: $city-color-major;
-  }
-}
-
-// City marker group and tooltip
+// City marker group and city names
 .city-marker-group {
-  .city-tooltip {
-    font-weight: 600;
+  .city-name {
+    font-weight: 500;
     fill: $city-label-color;
     stroke: $city-label-background;
-    stroke-width: 4;
+    stroke-width: 2;
     paint-order: stroke fill;
-    opacity: 0;
-    transition: opacity 0.1s ease;
     pointer-events: none;
+    font-family: sans-serif;
+    opacity: 0.8;
     // font-size set dynamically in component
-  }
-  
-  &:hover .city-tooltip {
-    opacity: 1;
   }
 }
 

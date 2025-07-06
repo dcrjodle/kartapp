@@ -1,7 +1,7 @@
 /**
  * CityMarkers Component
  * 
- * Renders city markers on the map using latitude/longitude coordinates
+ * Renders city markers as architectural grid patterns on the map
  */
 
 import React, { memo, useMemo } from 'react';
@@ -69,25 +69,13 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
     <g role="group" aria-label={t('cities.population')}>
       {visibleCities.map((city, index) => {
         const [x, y] = projectToSVG(city.longitude, city.latitude, bounds, mapDimensions);
-        const sizeCategory = getCitySizeCategory(city.population);
-        
-        // Calculate base sizes for different population categories
-        const baseSizes = {
-          small: 8,
-          medium: 10,
-          large: 12,
-          major: 15
-        };
-        
-        // Use fixed sizes and CSS transforms to ensure consistent visual appearance
-        const radius = baseSizes[sizeCategory];
-        const fontSize = 14;
-        const textOffset = 20;
         
         // Calculate transform scale to counteract SVG scaling
-        // This ensures consistent visual size regardless of province aspect ratio
         const baseScale = selectedProvince ? zoom * 1.5 : 1;
         const transformScale = Math.min(baseScale, 1.5); // Cap maximum scale at 1.5x
+        
+        const fontSize = 12;
+        const textOffset = 8;
         
         return (
           <g 
@@ -98,40 +86,23 @@ const CityMarkers: React.FC<CityMarkersProps> = memo(({
               transformOrigin: `${x}px ${y}px`
             }}
           >
-            <circle
-              cx={x}
-              cy={y}
-              r={radius}
-              className={`city-marker city-marker--${sizeCategory}`}
-              role="button"
-              tabIndex={0}
+            {/* City name only */}
+            <text
+              x={x}
+              y={y - textOffset}
+              className="city-name"
+              textAnchor="middle"
+              pointerEvents="none"
+              fontSize={fontSize}
               aria-label={t('accessibility.cityMarker', {
                 name: city.name,
                 population: city.population.toLocaleString()
               })}
               data-city-name={city.name}
               data-testid={`city-${city.name.toLowerCase().replace(/\s+/g, '-')}`}
-              onClick={() => console.log('City clicked:', city.name)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  console.log('City selected:', city.name);
-                }
-              }}
-            >
-              {/* Tooltip title for hover */}
-              <title>{city.name}</title>
-            </circle>
-            {/* Custom tooltip */}
-            <text
-              x={x}
-              y={y - textOffset}
-              className="city-tooltip"
-              textAnchor="middle"
-              pointerEvents="none"
-              fontSize={fontSize}
             >
               {city.name}
+              <title>{city.name}</title>
             </text>
           </g>
         );

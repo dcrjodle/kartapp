@@ -1,12 +1,13 @@
 /**
  * MapProvinces Component
  * 
- * Renders the interactive province polygons on the map
+ * Renders the interactive province polygons on the map with hand-drawn appearance
  */
 
 import React, { memo, useMemo } from 'react';
 import { type Provinces } from '../utils/mapProjection'; // TODO: Migrate to Province from types/geographic.ts
 import { useTranslations } from '../hooks/useTranslations';
+import { generateHandDrawnPath } from '../utils/handDrawnStrokes';
 
 interface MapProvincesProps {
   provinces: Provinces[];
@@ -30,13 +31,24 @@ const MapProvinces: React.FC<MapProvincesProps> = memo(({
     [showOnlySelected, selectedProvince, provinces]
   );
 
+  // Generate hand-drawn paths for all provinces
+  const handDrawnPaths = useMemo(() => {
+    return provincePaths.map((pathData, index) => 
+      generateHandDrawnPath(pathData, {
+        roughness: 0.8,
+        bowing: 1.2,
+        seed: index + 1, // Use different seed for each province
+      })
+    );
+  }, [provincePaths]);
+
   return (
     <g role="group" aria-label={t('map.provinces')}>
       {displayProvinces.map((province, displayIndex) => {
         const originalIndex = showOnlySelected && selectedProvince
           ? provinces.findIndex((p) => p.id === province.id)
           : displayIndex;
-        const pathData = provincePaths[originalIndex];
+        const pathData = handDrawnPaths[originalIndex];
 
         return (
           <path
@@ -56,6 +68,7 @@ const MapProvinces: React.FC<MapProvincesProps> = memo(({
             })}
             data-testid={`province-${province.name?.toLowerCase().replace(/\s+/g, '-')}`}
             data-selected={selectedProvince?.id === province.id}
+            filter="url(#roughen)"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();

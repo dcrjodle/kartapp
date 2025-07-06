@@ -120,32 +120,31 @@
 
   &__province {
     fill: $province-fill;
-    fill-opacity: 0.7;
+    fill-opacity: 0.1;
     stroke: $province-stroke;
     stroke-width: 1;
     cursor: pointer;
-    transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
+    transition: fill-opacity 0.2s ease;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 3,1;
 
     &:hover,
     &:focus {
-      fill-opacity: 0.9;
-      stroke-width: 2;
+      fill-opacity: 0.4;
       outline: none;
     }
 
     &:focus {
       stroke: $province-focus-stroke;
-      stroke-width: 3;
     }
 
     &--selected {
-      fill-opacity: 0.9;
-      stroke-width: 2;
+      fill-opacity: 0.3;
       stroke: $province-selected-stroke;
       
       &:hover {
-        fill-opacity: 1;
-        stroke-width: 3;
+        fill-opacity: 0.5;
       }
     }
   }
